@@ -3,7 +3,6 @@ package report
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -15,92 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
-
-// HandleUpload report
-// @Summary Upload coverage report
-// @Tags Report
-// @Param id path string	true "report id"
-// @Param file formData file true "report"
-// @Param commit formData string true "Git commit SHA"
-// @Param type formData string true "report type"
-// @Param ref formData string false "ref"
-// @Param root formData string false "git worktree root path"
-// @Param files formData string false "files list of the repository"
-// @Success 200 {string} string "ok"
-// @Failure 400 {string} string "error message"
-// @Router /reports/{id} [post]
-func HandleUpload(
-	coverageService core.CoverageService,
-	reportStore core.ReportStore,
-) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if _, ok := c.GetPostForm("type"); !ok {
-			c.String(400, "must have report type")
-			return
-		}
-
-		if _, ok := c.GetPostForm("commit"); !ok {
-			c.String(400, "must have commit SHA")
-			return
-		}
-
-		reportID := c.Param("id")
-		ref := c.PostForm("ref")
-		reportType := core.ReportType(c.PostForm("type"))
-		commit := c.PostForm("commit")
-		root := c.PostForm("root")
-
-		ctx := c.Request.Context()
-
-		// get upload file
-		file, err := c.FormFile("file")
-		if err != nil {
-			c.Error(err)
-			c.String(400, err.Error())
-			return
-		}
-
-		files := make([]string, 0)
-		if c.PostForm("files") != "" {
-			if err := json.Unmarshal([]byte(c.PostForm("files")), &files); err != nil {
-				c.Error(err)
-				c.String(500, err.Error())
-				return
-			}
-		}
-
-		reader, err := file.Open()
-		coverage, err := loadCoverageReport(
-			ctx,
-			coverageService,
-			reportType,
-			reader,
-			root,
-			MustGetSetting(c),
-		)
-		if err != nil {
-			log.Error(err)
-			c.String(500, err.Error())
-			return
-		}
-
-		report := &core.Report{
-			ReportID: reportID,
-			Coverages: []*core.CoverageReport{
-				coverage,
-			},
-			Files:     files,
-			Reference: ref,
-			Commit:    commit,
-		}
-		if err := reportStore.Upload(report); err != nil {
-			c.Error(err)
-			c.String(500, err.Error())
-			return
-		}
-		c.String(200, "ok")
-	}
-}
 
 // HandleRepo for report id
 // @Summary get repository of the report id
@@ -415,29 +328,6 @@ func getAll(store core.ReportStore, reportID string) ([]*core.Report, error) {
 	return store.Finds(&core.Report{
 		ReportID: reportID,
 	})
-}
-
-// loadCoverageReort from io reader and apply repository wide setting
-func loadCoverageReport(
-	ctx context.Context,
-	service core.CoverageService,
-	reportType core.ReportType,
-	data io.Reader,
-	root string,
-	setting *core.RepoSetting,
-) (*core.CoverageReport, error) {
-	coverage, err := service.Report(ctx, reportType, data)
-	if err != nil {
-		return nil, err
-	}
-	if err := service.TrimFileNamePrefix(ctx, coverage, root); err != nil {
-		return nil, err
-	}
-	if err := service.TrimFileNames(ctx, coverage, setting.Filters); err != nil {
-		return nil, err
-	}
-	coverage.Type = reportType
-	return coverage, nil
 }
 
 // getGitRepository with given Repo

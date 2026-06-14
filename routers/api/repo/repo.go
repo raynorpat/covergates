@@ -6,6 +6,7 @@ import (
 
 	"github.com/covergates/covergates/config"
 	"github.com/covergates/covergates/core"
+	"github.com/covergates/covergates/modules/util"
 	"github.com/covergates/covergates/routers/api/request"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/context"
@@ -91,6 +92,41 @@ func HandleReportIDRenew(store core.RepoStore, service core.SCMService) gin.Hand
 		}
 		c.JSON(200, repo)
 		return
+	}
+}
+
+// HandleTokenRenew generates a new upload token for the repository
+// @Summary renew repository upload token
+// @Tags Repository
+// @Param scm path string true "SCM"
+// @Param namespace path string true "Namespace"
+// @Param name path string true "name"
+// @Success 200 {object} core.Repo "updated repository"
+// @Router /repos/{scm}/{namespace}/{name}/token [patch]
+func HandleTokenRenew(store core.RepoStore) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user := request.MustGetUserFrom(c)
+		repo, err := store.Find(&core.Repo{
+			Name:      c.Param("name"),
+			NameSpace: c.Param("namespace"),
+			SCM:       core.SCMProvider(c.Param("scm")),
+		})
+		if err != nil {
+			c.String(500, err.Error())
+			return
+		}
+		repo.Token = util.GenerateToken()
+		if err := store.Update(repo); err != nil {
+			c.Error(err)
+			c.String(500, err.Error())
+			return
+		}
+		if err := store.UpdateCreator(repo, user); err != nil {
+			c.Error(err)
+			c.String(500, err.Error())
+			return
+		}
+		c.JSON(200, repo)
 	}
 }
 

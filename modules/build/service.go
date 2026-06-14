@@ -15,8 +15,19 @@ type Service struct {
 }
 
 // Finalize merges all jobs into the build, computes coverage and the delta
-// against a base build, and marks the build done.
+// against a base build, and marks the build done. On any failure the build is
+// marked errored and the error is returned.
 func (s *Service) Finalize(ctx context.Context, repo *core.Repo, build *core.Build) error {
+	if err := s.finalize(ctx, repo, build); err != nil {
+		build.Status = core.BuildErrored
+		build.FinishedAt = time.Now()
+		_ = s.Builds.Update(build)
+		return err
+	}
+	return nil
+}
+
+func (s *Service) finalize(ctx context.Context, repo *core.Repo, build *core.Build) error {
 	jobs, err := s.Builds.Jobs(build.ID)
 	if err != nil {
 		return err

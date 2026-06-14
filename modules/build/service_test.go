@@ -2,6 +2,7 @@ package build
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/covergates/covergates/core"
@@ -119,5 +120,29 @@ func TestFinalizePullRequestUsesBaseBranch(t *testing.T) {
 	svc := &Service{Builds: builds, Repos: repos, SCM: scm}
 	if err := svc.Finalize(context.Background(), repo, build); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestFinalizeErroredOnFailure(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	builds := mock.NewMockBuildStore(ctrl)
+	repos := mock.NewMockRepoStore(ctrl)
+	scm := mock.NewMockSCMService(ctrl)
+
+	repo := &core.Repo{ID: 1, Branch: "master"}
+	build := &core.Build{ID: 5, RepoID: 1, Branch: "master", Status: core.BuildProcessing}
+
+	builds.EXPECT().Jobs(uint(5)).Return(nil, errors.New("db down"))
+	builds.EXPECT().Update(gomock.Any()).DoAndReturn(func(b *core.Build) error {
+		if b.Status != core.BuildErrored {
+			t.Fatalf("status = %v, want errored", b.Status)
+		}
+		return nil
+	})
+
+	svc := &Service{Builds: builds, Repos: repos, SCM: scm}
+	if err := svc.Finalize(context.Background(), repo, build); err == nil {
+		t.Fatal("expected error")
 	}
 }

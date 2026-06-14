@@ -1,12 +1,11 @@
 package core
 
 import (
-	"context"
 	"io"
 	"time"
 )
 
-//go:generate mockgen -package mock -destination ../mock/report_mock.go . ReportStore,CoverageService
+//go:generate mockgen -package mock -destination ../mock/report_mock.go . ReportStore
 
 // FileNameFilters is a list of regular expression to trim file name
 type FileNameFilters []string
@@ -38,17 +37,6 @@ type CoverageReport struct {
 type CoverageReportDiff struct {
 	StatementCoverageDiff float64
 	Files                 []*FileDiff
-}
-
-// CoverageService provides CoverReport
-type CoverageService interface {
-	Report(ctx context.Context, t ReportType, r io.Reader) (*CoverageReport, error)
-	// Find coverage report from the given path.
-	Find(ctx context.Context, t ReportType, path string) (string, error)
-	Open(ctx context.Context, t ReportType, path string) (io.Reader, error)
-	// TrimFileNames in the coverage report
-	TrimFileNames(ctx context.Context, report *CoverageReport, filters FileNameFilters) error
-	TrimFileNamePrefix(ctx context.Context, report *CoverageReport, prefixes ...string) error
 }
 
 // ReportStore the report in storage

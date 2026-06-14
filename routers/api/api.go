@@ -34,8 +34,7 @@ type Router struct {
 	Config  *config.Config
 	Session core.Session
 	// service
-	CoverageService core.CoverageService
-	ChartService    core.ChartService
+	ChartService core.ChartService
 	SCMService      core.SCMService
 	RepoService     core.RepoService
 	ReportService   core.ReportService

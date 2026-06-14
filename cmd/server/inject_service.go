@@ -12,14 +12,12 @@ import (
 	"github.com/covergates/covergates/modules/report"
 	"github.com/covergates/covergates/modules/scm"
 	"github.com/covergates/covergates/modules/session"
-	"github.com/covergates/covergates/service/coverage"
 	"github.com/google/wire"
 )
 
 var serviceSet = wire.NewSet(
 	provideSCMService,
 	provideSession,
-	provideCoverageService,
 	provideChartService,
 	provideGit,
 	provideReportService,
@@ -43,10 +41,6 @@ func provideSCMService(
 
 func provideSession() core.Session {
 	return &session.Session{}
-}
-
-func provideCoverageService() core.CoverageService {
-	return &coverage.Service{}
 }
 
 func provideChartService() core.ChartService {

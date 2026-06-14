@@ -18,9 +18,8 @@ type Routers struct {
 	Session         core.Session
 	LoginMiddleware core.LoginMiddleware
 	// service
-	SCMService      core.SCMService
-	CoverageService core.CoverageService
-	ChartService    core.ChartService
+	SCMService   core.SCMService
+	ChartService core.ChartService
 	RepoService     core.RepoService
 	ReportService   core.ReportService
 	HookService     core.HookService
@@ -47,10 +46,9 @@ func (r *Routers) RegisterRoutes(e *gin.Engine) {
 		Session:         r.Session,
 	}
 	apiRoute := &api.Router{
-		Config:          r.Config,
-		Session:         r.Session,
-		CoverageService: r.CoverageService,
-		ChartService:    r.ChartService,
+		Config:       r.Config,
+		Session:      r.Session,
+		ChartService: r.ChartService,
 		SCMService:      r.SCMService,
 		RepoService:     r.RepoService,
 		ReportService:   r.ReportService,

@@ -25,6 +25,7 @@ vendor/
 
 # Database
 core.db
+*.db
 *.zip
 !**/testdata/*.zip
 test.log

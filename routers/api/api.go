@@ -5,6 +5,7 @@ import (
 
 	"github.com/covergates/covergates/config"
 	"github.com/covergates/covergates/core"
+	"github.com/covergates/covergates/routers/api/build"
 	"github.com/covergates/covergates/routers/api/repo"
 	"github.com/covergates/covergates/routers/api/report"
 	"github.com/covergates/covergates/routers/api/request"
@@ -40,11 +41,13 @@ type Router struct {
 	ReportService   core.ReportService
 	HookService     core.HookService
 	OAuthService    core.OAuthService
+	BuildService    core.BuildService
 	// store
 	UserStore   core.UserStore
 	ReportStore core.ReportStore
 	RepoStore   core.RepoStore
 	OAuthStore  core.OAuthStore
+	BuildStore  core.BuildStore
 }
 
 func host(addr string) string {
@@ -61,6 +64,7 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 	checkLogin := request.CheckLogin(r.Session, r.OAuthService)
 	e.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	g := e.Group("/api/v1")
+	g.POST("/jobs", build.HandleJobs(r.Config, r.RepoStore, r.BuildStore, r.BuildService))
 	{
 		g := g.Group("/user")
 		g.GET("", checkLogin, user.HandleGet())
@@ -116,6 +120,7 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 			g.GET("/setting", repo.HandleGetSetting(r.RepoStore))
 			g.POST("/setting", repo.WithRepo(r.RepoStore), repo.HandleUpdateSetting(r.RepoStore, r.SCMService))
 			g.PATCH("/report", repo.HandleReportIDRenew(r.RepoStore, r.SCMService))
+			g.PATCH("/token", repo.HandleTokenRenew(r.RepoStore))
 			g.GET("/files", repo.HandleGetFiles(r.SCMService))
 			g.GET("/content/*path", repo.HandleGetFileContent(r.SCMService))
 			g.POST("/hook/create", repo.WithRepo(r.RepoStore), repo.HandleHookCreate(r.HookService))
@@ -128,5 +133,8 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 		g := g.Group("/repos/:scm/:namespace/:name")
 		g.GET("", repo.HandleGet(r.RepoStore))
 		g.POST("/hook", repo.WithRepo(r.RepoStore), repo.HandleHook(r.SCMService, r.HookService))
+		g.GET("/builds", build.HandleList(r.SCMService, r.RepoStore, r.BuildStore))
+		g.GET("/builds/:number", build.HandleGet(r.SCMService, r.RepoStore, r.BuildStore))
 	}
+	e.POST("/webhook", build.HandleWebhook(r.RepoStore, r.BuildStore, r.BuildService))
 }

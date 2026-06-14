@@ -26,10 +26,12 @@ type Routers struct {
 	HookService     core.HookService
 	OAuthService    core.OAuthService
 	// store
-	UserStore   core.UserStore
-	ReportStore core.ReportStore
-	RepoStore   core.RepoStore
-	OAuthStore  core.OAuthStore
+	UserStore    core.UserStore
+	ReportStore  core.ReportStore
+	RepoStore    core.RepoStore
+	OAuthStore   core.OAuthStore
+	BuildStore   core.BuildStore
+	BuildService core.BuildService
 }
 
 // RegisterRoutes for Gin engine
@@ -58,6 +60,8 @@ func (r *Routers) RegisterRoutes(e *gin.Engine) {
 		ReportStore:     r.ReportStore,
 		RepoStore:       r.RepoStore,
 		OAuthStore:      r.OAuthStore,
+		BuildStore:      r.BuildStore,
+		BuildService:    r.BuildService,
 	}
 	webRoute.RegisterRoutes(e)
 	apiRoute.RegisterRoutes(e)

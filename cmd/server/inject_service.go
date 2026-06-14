@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/covergates/covergates/config"
 	"github.com/covergates/covergates/core"
+	buildmod "github.com/covergates/covergates/modules/build"
 	"github.com/covergates/covergates/modules/charts"
 	"github.com/covergates/covergates/modules/git"
 	"github.com/covergates/covergates/modules/hook"
@@ -25,6 +26,7 @@ var serviceSet = wire.NewSet(
 	provideHookService,
 	provideOAuthService,
 	provideRepoService,
+	provideBuildService,
 )
 
 func provideSCMService(
@@ -95,4 +97,16 @@ func provideRepoService(
 ) core.RepoService {
 	return repo.NewService(config, scmService, userStore, repoStore)
 
+}
+
+func provideBuildService(
+	buildStore core.BuildStore,
+	repoStore core.RepoStore,
+	scmService core.SCMService,
+) core.BuildService {
+	return &buildmod.Service{
+		Builds: buildStore,
+		Repos:  repoStore,
+		SCM:    scmService,
+	}
 }

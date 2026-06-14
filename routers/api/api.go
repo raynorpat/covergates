@@ -106,7 +106,7 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 			r.ChartService,
 		))
 		g.GET("/:id/card", report.HandleGetCard(r.RepoStore, r.ReportStore, r.ChartService))
-		g.GET("/:id/badge", report.HandleGetBadge(r.ReportStore, r.RepoStore))
+		g.GET("/:id/badge", report.HandleGetBadge(r.RepoStore, r.BuildStore))
 	}
 	{
 		g := g.Group("/repos")

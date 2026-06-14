@@ -12,23 +12,26 @@ import (
 // @Summary get badge for the report id
 // @Tags Report
 // @Param id path string true "report id"
-// @Param latest query bool false "get latest report in main branch"
 // @Success 200 {object} string "badge svg"
 // @Router /reports/{id}/badge [get]
 func HandleGetBadge(
-	reportStore core.ReportStore,
 	repoStore core.RepoStore,
+	buildStore core.BuildStore,
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		reportID := c.Param("id")
-		report, err := getLatest(reportStore, repoStore, reportID)
+		repo, err := repoStore.Find(&core.Repo{ReportID: reportID})
 		if err != nil {
-			c.String(500, err.Error())
+			c.String(404, "repository not found")
 			return
+		}
+		coverage := 0
+		if build, err := buildStore.LatestOnBranch(repo.ID, repo.Branch, 0); err == nil {
+			coverage = int(build.Coverage * 100)
 		}
 		data, err := badge.RenderBytes(
 			"Covergates",
-			fmt.Sprintf("%d%%", int(report.StatementCoverage()*100)),
+			fmt.Sprintf("%d%%", coverage),
 			"#00838F",
 		)
 		if err != nil {

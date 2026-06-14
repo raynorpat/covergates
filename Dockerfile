@@ -10,15 +10,11 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 
-FROM build as cli-build
-COPY . .
-RUN CGO_ENABLED=1 GOOS=linux go build -o covergates ./cmd/cli
-
 FROM build as server-build
 RUN apk --update add nodejs npm
 COPY web/package.json ./web/package.json
 COPY web/package-lock.json ./web/package-lock.json
-RUN cd web && npm install 
+RUN cd web && npm install
 RUN node --version && npm --version
 RUN go env -w GOBIN=/bin
 RUN go install github.com/bradrydzewski/togo@latest
@@ -27,10 +23,6 @@ RUN go generate ./web
 COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build -v -o covergates ./cmd/server
 
-FROM alpine as cli
-COPY --from=cli-build /go/src/github.com/covergates/covergates/covergates /covergates
-
 FROM alpine as server
 COPY --from=server-build /go/src/github.com/covergates/covergates/covergates /covergates
 ENTRYPOINT [ "/covergates" ]
-

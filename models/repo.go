@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/covergates/covergates/core"
+	"github.com/covergates/covergates/modules/util"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,7 @@ type Repo struct {
 	gorm.Model
 	URL       string `gorm:"size:256;uniqueIndex;not null"`
 	ReportID  string
+	Token     string `gorm:"index"`
 	NameSpace string `gorm:"index;not null"`
 	Name      string `gorm:"index;not null"`
 	Branch    string
@@ -50,6 +52,7 @@ func (repo *Repo) ToCoreRepo() *core.Repo {
 		Name:      repo.Name,
 		NameSpace: repo.NameSpace,
 		ReportID:  repo.ReportID,
+		Token:     repo.Token,
 		SCM:       core.SCMProvider(repo.SCM),
 		Branch:    repo.Branch,
 		URL:       repo.URL,
@@ -80,8 +83,14 @@ func (store *RepoStore) Create(repo *core.Repo) error {
 		SCM:       string(repo.SCM),
 		Branch:    repo.Branch,
 		Private:   repo.Private,
+		Token:     util.GenerateToken(),
 	}
-	return session.Create(r).Error
+	if err := session.Create(r).Error; err != nil {
+		return err
+	}
+	repo.Token = r.Token
+	repo.ID = r.ID
+	return nil
 }
 
 // Update repository information
@@ -253,6 +262,7 @@ func (store *RepoStore) FindHook(repo *core.Repo) (*core.Hook, error) {
 
 func copyRepo(dst *Repo, src *core.Repo) {
 	dst.ReportID = src.ReportID
+	dst.Token = src.Token
 	dst.Branch = src.Branch
 	dst.Private = src.Private
 }

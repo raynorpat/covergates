@@ -4,3 +4,7 @@ $hit-statement-color: rgba(176, 214, 191, 0.4);
 $miss-statement-color: rgba(255, 0, 0, 0.4);
 
 $table-header-background: rgba(106, 219, 219, 0.5);
+
+// Per-line coverage highlighting (source view).
+.statement-hit { background: $hit-statement-color; }
+.statement-miss { background: $miss-statement-color; }

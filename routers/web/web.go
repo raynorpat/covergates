@@ -31,9 +31,6 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 	h := gin.WrapH(http.FileServer(web.New()))
 	e.GET("/favicon.ico", h)
 	e.GET("/logo.png", h)
-	e.GET("/js/*filepath", h)
-	e.GET("/css/*filepath", h)
-	e.GET("/img/*filepath", h)
-	e.GET("/fonts/*filepath", h)
+	e.GET("/assets/*filepath", h)
 	e.NoRoute(HandleIndex(r.Config))
 }

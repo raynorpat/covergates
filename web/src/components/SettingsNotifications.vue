@@ -39,7 +39,7 @@ function save() {
     </p>
     <v-select v-model="trigger" :items="triggerItems" label="When to notify" density="compact" />
     <v-textarea v-model="recipientsText" label="Email recipients (one per line)" rows="3" auto-grow />
-    <v-text-field v-model="slackWebhook" type="text" label="Slack webhook URL" density="compact" />
+    <v-text-field v-model="slackWebhook" type="text" label="Slack webhook URL" hint="Leave blank to keep the current webhook" persistent-hint density="compact" />
     <v-btn color="primary" :loading="busy" @click="save">Save</v-btn>
   </v-card>
 </template>

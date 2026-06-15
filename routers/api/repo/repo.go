@@ -438,6 +438,7 @@ func HandleGetSetting(store core.RepoStore, service core.SCMService) gin.Handler
 			c.JSON(404, &core.RepoSetting{})
 			return
 		}
+		setting.SlackWebhook = "" // never expose the webhook secret on read
 		c.JSON(200, setting)
 	}
 }
@@ -463,10 +464,16 @@ func HandleUpdateSetting(store core.RepoStore, service core.SCMService) gin.Hand
 			c.JSON(400, setting)
 			return
 		}
+		if setting.SlackWebhook == "" {
+			if existing, err := store.Setting(repo); err == nil {
+				setting.SlackWebhook = existing.SlackWebhook
+			}
+		}
 		if err := store.UpdateSetting(repo, setting); err != nil {
 			c.JSON(500, setting)
 			return
 		}
+		setting.SlackWebhook = "" // never echo the webhook secret in the response
 		c.JSON(200, setting)
 	}
 }

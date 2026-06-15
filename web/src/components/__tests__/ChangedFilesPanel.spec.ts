@@ -37,6 +37,7 @@ describe('ChangedFilesPanel', () => {
     await flushPromises()
     expect(w.text()).toContain('a.go')
     expect(w.text()).toContain('50.0%')
+    expect(http.get).toHaveBeenCalledWith('/api/v1/repos/github/o/r/pulls/7/changes')
   })
 
   it('shows sign-in on 401', async () => {

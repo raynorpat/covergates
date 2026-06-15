@@ -30,7 +30,7 @@ async function load() {
   needLogin.value = false
   error.value = ''
   try {
-    changes.value = await store.fetchChanges(props.repoPath, props.build.number)
+    changes.value = await store.fetchChanges(props.repoPath, props.build.pullRequest)
   } catch (e) {
     if (is401(e)) needLogin.value = true
     else error.value = errorMessage(e)

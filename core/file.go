@@ -16,10 +16,10 @@ type FileDiff struct {
 
 // FileChange defines file status
 type FileChange struct {
-	Path    string
-	Added   bool
-	Renamed bool
-	Deleted bool
+	Path    string `json:"path"`
+	Added   bool   `json:"added"`
+	Renamed bool   `json:"renamed"`
+	Deleted bool   `json:"deleted"`
 }
 
 // StatementHit records hit count for a single line

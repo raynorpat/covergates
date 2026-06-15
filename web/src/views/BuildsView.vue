@@ -38,7 +38,13 @@ onMounted(load)
 
 <template>
   <v-container class="py-6">
-    <h2 class="text-h5 mb-4">{{ namespace }}/{{ name }}</h2>
+    <div class="d-flex align-center mb-4">
+      <h2 class="text-h5">{{ namespace }}/{{ name }}</h2>
+      <v-spacer />
+      <v-btn icon variant="text" :to="`/report/${scm}/${namespace}/${name}/settings`" aria-label="settings">
+        <v-icon>mdi-cog</v-icon>
+      </v-btn>
+    </div>
     <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-3" />
     <v-card v-else-if="needLogin" class="pa-6 text-center">
       <p class="mb-4">Sign in to view this repository.</p>

@@ -86,18 +86,15 @@ func (service *Service) MarkdownReport(source, target *core.Report) (io.Reader, 
 			continue
 		}
 		mark := ""
-		sign := ""
 		if file.StatementCoverageDiff > 0 {
 			mark = upArrow
-			sign = "+"
 		} else if file.StatementCoverageDiff < 0 {
 			mark = downArrow
-			sign = "-"
 		} else {
 			continue
 		}
 
-		buf.WriteString(fmt.Sprintf("|%s|%s|%.2f%% (%s%.2f%%)|\n", mark, file.File.Name, file.File.StatementCoverage*100, sign, file.StatementCoverageDiff*100))
+		buf.WriteString(fmt.Sprintf("|%s|%s|%.2f%% (%+.2f%%)|\n", mark, file.File.Name, file.File.StatementCoverage*100, file.StatementCoverageDiff*100))
 	}
 	return buf, nil
 }

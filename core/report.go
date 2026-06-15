@@ -91,6 +91,9 @@ func (cov *CoverageReport) ComputeStatementCoverage() float64 {
 		sum += file.StatementCoverage * hits
 		total += hits
 	}
+	if total == 0 {
+		return 0
+	}
 
 	return sum / total
 }

@@ -11,22 +11,20 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-const expectMarkdown = `### [Coverage: 50.0%](http://localhost/report/github/space/name?ref=commit)
+const expectMarkdown = `### [Coverage: 50.0%](http://localhost/report/github/space/name?gitref=commit)
 
 ||File|Coverage|
 |--|--|--------|
-|:arrow_up_small:|A|1.00|
-|:arrow_down_small:|B|0.00|
-||C|0.50|
+|:arrow_up_small:|A|100.00% (+20.00%)|
+|:arrow_down_small:|B|0.00% (-80.00%)|
 `
 
-const expectMarkdownNoTarget = `### [Coverage: 50.0%](http://localhost/report/github/space/name?ref=commit)
+const expectMarkdownNoTarget = `### [Coverage: 50.0%](http://localhost/report/github/space/name?gitref=commit)
 
 ||File|Coverage|
 |--|--|--------|
-|:arrow_up_small:|A|1.00|
-||B|0.00|
-|:arrow_up_small:|C|0.50|
+|:arrow_up_small:|A|100.00% (+100.00%)|
+|:arrow_up_small:|C|50.00% (+50.00%)|
 `
 
 func TestMarkdownReport(t *testing.T) {
@@ -40,14 +38,17 @@ func TestMarkdownReport(t *testing.T) {
 					{
 						Name:              "A",
 						StatementCoverage: 1.0,
+						StatementHits:     []*core.StatementHit{{LineNumber: 1, Hits: 1}},
 					},
 					{
 						Name:              "B",
 						StatementCoverage: 0,
+						StatementHits:     []*core.StatementHit{{LineNumber: 1, Hits: 0}},
 					},
 					{
 						Name:              "C",
 						StatementCoverage: 0.5,
+						StatementHits:     []*core.StatementHit{{LineNumber: 1, Hits: 1}},
 					},
 				},
 			},

@@ -44,6 +44,17 @@ describe('Home', () => {
     expect(w.text()).not.toContain('Get started')
   })
 
+  it('degrades gracefully when stats fail', async () => {
+    ;(http.get as any).mockImplementation((url: string) => {
+      if (url.endsWith('/api/v1/user')) return Promise.resolve({ data: { login: 'me' } })
+      if (url.endsWith('/api/v1/user/repos')) return Promise.resolve({ data: [{ ID: 1, URL: 'u', ReportID: 'x', NameSpace: 'o', Name: 'a', Branch: 'm', Private: false, SCM: 'github' }] })
+      return Promise.reject(new Error('boom')) // /stats fails
+    })
+    const w = mount(Home, { global: { plugins: [vuetify, router] } })
+    await flushPromises()
+    expect(w.text()).toContain('Welcome')
+  })
+
   it('shows the get-started hero when not authenticated', async () => {
     routeGet({ '/api/v1/user': null })
     const w = mount(Home, { global: { plugins: [vuetify, router] } })

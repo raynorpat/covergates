@@ -17,6 +17,8 @@ onMounted(async () => {
   try {
     await repos.ensureSynced()
     await repos.fetchStats()
+  } catch {
+    // homepage degrades gracefully — stats simply won't show
   } finally {
     busy.value = false
   }
@@ -67,7 +69,16 @@ function openRepo(r: { scm: string; namespace: string; name: string }) {
         <div class="text-h6 mb-2">Top repositories</div>
         <v-table v-if="repos.stats.topRepos.length" density="compact">
           <tbody>
-            <tr v-for="r in repos.stats.topRepos" :key="`${r.namespace}/${r.name}`" style="cursor: pointer" @click="openRepo(r)">
+            <tr
+              v-for="r in repos.stats.topRepos"
+              :key="`${r.namespace}/${r.name}`"
+              tabindex="0"
+              role="button"
+              :aria-label="`Open ${r.namespace}/${r.name}`"
+              style="cursor: pointer"
+              @click="openRepo(r)"
+              @keydown.enter="openRepo(r)"
+            >
               <td><code>{{ r.namespace }}/{{ r.name }}</code></td>
               <td class="text-right">
                 <v-chip :color="coverageColor(r.coverage)" size="small" label>{{ formatPercent(r.coverage) }}</v-chip>
@@ -76,7 +87,8 @@ function openRepo(r: { scm: string; namespace: string; name: string }) {
           </tbody>
         </v-table>
         <p v-else class="text-body-2 text-medium-emphasis mb-0">
-          No coverage yet — <a href="#" @click.prevent="router.push('/repos')">activate a repository</a>.
+          No coverage yet —
+          <v-btn variant="text" size="small" color="primary" @click="router.push('/repos')">activate a repository</v-btn>
         </p>
       </v-card>
     </template>

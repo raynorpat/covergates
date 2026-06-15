@@ -26,7 +26,12 @@ async function sync() {
   try { await store.synchronize() } catch (e) { snackbar.value = errorMessage(e) } finally { busy.value = false }
 }
 
-onMounted(load)
+async function init() {
+  busy.value = true
+  try { await store.ensureSynced() } catch (e) { snackbar.value = errorMessage(e) } finally { busy.value = false }
+}
+
+onMounted(init)
 </script>
 
 <template>

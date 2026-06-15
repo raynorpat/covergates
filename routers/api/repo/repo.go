@@ -435,10 +435,8 @@ func HandleGetSetting(store core.RepoStore, service core.SCMService) gin.Handler
 		}
 		setting, err := store.Setting(repo)
 		if err != nil {
-			if err != nil {
-				c.JSON(404, &core.RepoSetting{})
-				return
-			}
+			c.JSON(404, &core.RepoSetting{})
+			return
 		}
 		c.JSON(200, setting)
 	}

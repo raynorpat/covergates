@@ -5,7 +5,9 @@ import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import User from '@/views/User.vue'
-import RepoPlaceholder from '@/views/RepoPlaceholder.vue'
+import BuildsView from '@/views/BuildsView.vue'
+import BuildDetailView from '@/views/BuildDetailView.vue'
+import SourceView from '@/views/SourceView.vue'
 
 const router = createRouter({
   history: createWebHistory(basePath() + '/'),
@@ -14,12 +16,9 @@ const router = createRouter({
     { path: '/login', name: 'login', component: Login },
     { path: '/repos', name: 'dashboard', component: Dashboard, meta: { requiresAuth: true } },
     { path: '/user', name: 'user', component: User, meta: { requiresAuth: true } },
-    {
-      path: '/report/:scm/:namespace/:name',
-      name: 'repo',
-      component: RepoPlaceholder,
-      meta: { requiresAuth: true }
-    },
+    { path: '/report/:scm/:namespace/:name', name: 'repo', component: BuildsView },
+    { path: '/report/:scm/:namespace/:name/builds/:number', name: 'build', component: BuildDetailView },
+    { path: '/report/:scm/:namespace/:name/builds/:number/source/:path(.*)*', name: 'source', component: SourceView },
     { path: '/:pathMatch(.*)*', redirect: '/' }
   ]
 })

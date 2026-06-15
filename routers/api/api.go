@@ -105,14 +105,14 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 		{
 			g := g.Group("/:scm/:namespace/:name")
 			g.PATCH("", repo.HandleSync(r.SCMService, r.RepoStore))
-			g.GET("/setting", repo.HandleGetSetting(r.RepoStore))
+			g.GET("/setting", repo.HandleGetSetting(r.RepoStore, r.SCMService))
 			g.POST("/setting", repo.WithRepo(r.RepoStore), repo.HandleUpdateSetting(r.RepoStore, r.SCMService))
 			g.PATCH("/report", repo.HandleReportIDRenew(r.RepoStore, r.SCMService))
 			g.GET("/token", repo.HandleTokenGet(r.RepoStore, r.SCMService))
 			g.PATCH("/token", repo.HandleTokenRenew(r.RepoStore, r.SCMService))
 			g.GET("/files", repo.HandleGetFiles(r.SCMService))
 			g.GET("/content/*path", repo.HandleGetFileContent(r.SCMService))
-			g.POST("/hook/create", repo.WithRepo(r.RepoStore), repo.HandleHookCreate(r.HookService))
+			g.POST("/hook/create", repo.WithRepo(r.RepoStore), repo.HandleHookCreate(r.HookService, r.SCMService, r.RepoStore))
 			g.GET("/commits", repo.WithRepo(r.RepoStore), repo.HandleListCommits(r.SCMService))
 			g.GET("/branches", repo.WithRepo(r.RepoStore), repo.HandleListBranches(r.SCMService))
 		}

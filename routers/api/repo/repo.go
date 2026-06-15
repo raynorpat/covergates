@@ -176,6 +176,24 @@ func canAccessRepo(c *gin.Context, service core.SCMService, repo *core.Repo) boo
 	return err == nil
 }
 
+// canAdminRepo reports whether the current user may administer the repository
+// (SCM admin, or the activator/creator). Used for settings writes and webhook setup.
+func canAdminRepo(c *gin.Context, service core.SCMService, store core.RepoStore, repo *core.Repo) bool {
+	user, ok := request.UserFrom(c)
+	if !ok {
+		return false
+	}
+	client, err := service.Client(repo.SCM)
+	if err != nil {
+		return false
+	}
+	if client.Repositories().IsAdmin(c.Request.Context(), user, repo.FullName()) {
+		return true
+	}
+	creator, err := store.Creator(repo)
+	return err == nil && creator.Login == user.Login
+}
+
 // HandleGet repository
 // @Summary get repository
 // @Tags Repository
@@ -400,7 +418,7 @@ func HandleGetFileContent(service core.SCMService) gin.HandlerFunc {
 // @Param name path string true "name"
 // @Success 200 {object} core.RepoSetting repository setting
 // @Router /repos/{scm}/{namespace}/{name}/setting [get]
-func HandleGetSetting(store core.RepoStore) gin.HandlerFunc {
+func HandleGetSetting(store core.RepoStore, service core.SCMService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		repo, err := store.Find(&core.Repo{
 			NameSpace: c.Param("namespace"),
@@ -409,6 +427,10 @@ func HandleGetSetting(store core.RepoStore) gin.HandlerFunc {
 		})
 		if err != nil {
 			c.JSON(404, &core.RepoSetting{})
+			return
+		}
+		if !canAccessRepo(c, service, repo) {
+			c.JSON(403, &core.RepoSetting{})
 			return
 		}
 		setting, err := store.Setting(repo)
@@ -433,25 +455,10 @@ func HandleGetSetting(store core.RepoStore) gin.HandlerFunc {
 // @Router /repos/{scm}/{namespace}/{name}/setting [post]
 func HandleUpdateSetting(store core.RepoStore, service core.SCMService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := c.Request.Context()
 		repo := c.MustGet(keyRepo).(*core.Repo)
 		setting := &core.RepoSetting{}
-		user, ok := request.UserFrom(c)
-		if !ok {
-			c.JSON(401, setting)
-			return
-		}
-		creator, err := store.Creator(repo)
-		if err != nil {
-			c.JSON(500, setting)
-			return
-		}
-		client, err := service.Client(repo.SCM)
-		if err != nil {
-			c.JSON(500, setting)
-		}
-		if !client.Repositories().IsAdmin(ctx, user, repo.FullName()) && user.Login != creator.Login {
-			c.JSON(401, setting)
+		if !canAdminRepo(c, service, store, repo) {
+			c.JSON(403, setting)
 			return
 		}
 		if err := c.BindJSON(setting); err != nil {

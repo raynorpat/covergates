@@ -13,9 +13,13 @@ import (
 // @Param name path string true "name"
 // @Success 200 {object} string ok
 // @Router /repos/{scm}/{namespace}/{name}/hook/create [post]
-func HandleHookCreate(service core.HookService) gin.HandlerFunc {
+func HandleHookCreate(service core.HookService, scmService core.SCMService, store core.RepoStore) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		repo, _ := c.MustGet(keyRepo).(*core.Repo)
+		if !canAdminRepo(c, scmService, store, repo) {
+			c.String(403, "forbidden")
+			return
+		}
 		ctx := c.Request.Context()
 		if err := service.Create(ctx, repo); err != nil {
 			c.String(500, err.Error())

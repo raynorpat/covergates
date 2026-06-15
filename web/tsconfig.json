@@ -1,42 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
-    "module": "ES2020",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "strict": true,
     "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "node",
-    "experimentalDecorators": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["vitest/globals", "vuetify"],
     "baseUrl": ".",
-    "types": [
-      "webpack-env",
-      "jest",
-      "vuetify"
-    ],
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
-    "lib": [
-      "ES2018",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
+    "paths": { "@/*": ["src/*"] }
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "styleguide/*.ts",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/main.ts",
+    "src/App.vue",
+    "src/lib/**/*.ts",
+    "src/plugins/vuetify.ts",
+    "src/router/index.ts",
+    "src/layouts/**/*.vue",
+    "env.d.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

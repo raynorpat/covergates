@@ -43,6 +43,7 @@ func (s *Service) finalize(ctx context.Context, repo *core.Repo, build *core.Bui
 	if base, err := s.baseBuild(ctx, repo, build); err == nil && base != nil {
 		build.CoverageChange = build.Coverage - base.Coverage
 		build.BaseBuildID = base.ID
+		build.BaseBuildNumber = base.Number
 	}
 
 	build.Status = core.BuildDone

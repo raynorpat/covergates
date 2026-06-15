@@ -14,24 +14,25 @@ var errBuildFields = errors.New("build must have a repository id")
 // Build is a coverage build belonging to a repository.
 type Build struct {
 	gorm.Model
-	RepoID         uint `gorm:"index"`
-	Number         int  `gorm:"index"`
-	ServiceName    string
-	ServiceNumber  string `gorm:"index"`
-	Commit         string `gorm:"index"`
-	Branch         string `gorm:"index"`
-	PullRequest    int
-	Status         string
-	Parallel       bool
-	Coverage       float64
-	CoverageChange float64
-	BaseBuildID    uint
-	CommitMessage  string
-	AuthorName     string
-	AuthorEmail    string
-	CoverageData   []byte
-	Jobs           []*Job
-	FinishedAt     time.Time
+	RepoID          uint `gorm:"index"`
+	Number          int  `gorm:"index"`
+	ServiceName     string
+	ServiceNumber   string `gorm:"index"`
+	Commit          string `gorm:"index"`
+	Branch          string `gorm:"index"`
+	PullRequest     int
+	Status          string
+	Parallel        bool
+	Coverage        float64
+	CoverageChange  float64
+	BaseBuildID     uint
+	BaseBuildNumber int
+	CommitMessage   string
+	AuthorName      string
+	AuthorEmail     string
+	CoverageData    []byte
+	Jobs            []*Job
+	FinishedAt      time.Time
 }
 
 // Job is a single coverage submission within a build.
@@ -214,24 +215,25 @@ func (store *BuildStore) Update(b *core.Build) error {
 // merged source files are unmarshaled from CoverageData.
 func (m *Build) ToCoreBuild(withFiles bool) *core.Build {
 	b := &core.Build{
-		ID:             m.ID,
-		RepoID:         m.RepoID,
-		Number:         m.Number,
-		ServiceName:    m.ServiceName,
-		ServiceNumber:  m.ServiceNumber,
-		Commit:         m.Commit,
-		Branch:         m.Branch,
-		PullRequest:    m.PullRequest,
-		Status:         core.BuildStatus(m.Status),
-		Parallel:       m.Parallel,
-		Coverage:       m.Coverage,
-		CoverageChange: m.CoverageChange,
-		BaseBuildID:    m.BaseBuildID,
-		CommitMessage:  m.CommitMessage,
-		AuthorName:     m.AuthorName,
-		AuthorEmail:    m.AuthorEmail,
-		CreatedAt:      m.CreatedAt,
-		FinishedAt:     m.FinishedAt,
+		ID:              m.ID,
+		RepoID:          m.RepoID,
+		Number:          m.Number,
+		ServiceName:     m.ServiceName,
+		ServiceNumber:   m.ServiceNumber,
+		Commit:          m.Commit,
+		Branch:          m.Branch,
+		PullRequest:     m.PullRequest,
+		Status:          core.BuildStatus(m.Status),
+		Parallel:        m.Parallel,
+		Coverage:        m.Coverage,
+		CoverageChange:  m.CoverageChange,
+		BaseBuildID:     m.BaseBuildID,
+		BaseBuildNumber: m.BaseBuildNumber,
+		CommitMessage:   m.CommitMessage,
+		AuthorName:      m.AuthorName,
+		AuthorEmail:     m.AuthorEmail,
+		CreatedAt:       m.CreatedAt,
+		FinishedAt:      m.FinishedAt,
 	}
 	if withFiles && len(m.CoverageData) > 0 {
 		var files []*core.SourceFile
@@ -275,6 +277,7 @@ func copyBuildToModel(dst *Build, src *core.Build) {
 	dst.Coverage = src.Coverage
 	dst.CoverageChange = src.CoverageChange
 	dst.BaseBuildID = src.BaseBuildID
+	dst.BaseBuildNumber = src.BaseBuildNumber
 	dst.CommitMessage = src.CommitMessage
 	dst.AuthorName = src.AuthorName
 	dst.AuthorEmail = src.AuthorEmail

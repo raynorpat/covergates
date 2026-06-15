@@ -41,26 +41,27 @@ type Job struct {
 
 // Build is a coverage build for a repository, composed of one or more jobs.
 type Build struct {
-	ID             uint          `json:"id"`
-	RepoID         uint          `json:"repoID"`
-	Number         int           `json:"number"`
-	ServiceName    string        `json:"serviceName"`
-	ServiceNumber  string        `json:"serviceNumber"`
-	Commit         string        `json:"commit"`
-	Branch         string        `json:"branch"`
-	PullRequest    int           `json:"pullRequest"` // 0 if not a pull request build
-	Status         BuildStatus   `json:"status"`
-	Parallel       bool          `json:"parallel"`
-	Coverage       float64       `json:"coverage"`
-	CoverageChange float64       `json:"coverageChange"`
-	BaseBuildID    uint          `json:"baseBuildID"`
-	CommitMessage  string        `json:"commitMessage"`
-	AuthorName     string        `json:"authorName"`
-	AuthorEmail    string        `json:"authorEmail"`
-	SourceFiles    []*SourceFile `json:"sourceFiles,omitempty"`
-	Jobs           []*Job        `json:"jobs,omitempty"`
-	CreatedAt      time.Time     `json:"createdAt"`
-	FinishedAt     time.Time     `json:"finishedAt,omitempty"` // zero if not yet finished
+	ID              uint          `json:"id"`
+	RepoID          uint          `json:"repoID"`
+	Number          int           `json:"number"`
+	ServiceName     string        `json:"serviceName"`
+	ServiceNumber   string        `json:"serviceNumber"`
+	Commit          string        `json:"commit"`
+	Branch          string        `json:"branch"`
+	PullRequest     int           `json:"pullRequest"` // 0 if not a pull request build
+	Status          BuildStatus   `json:"status"`
+	Parallel        bool          `json:"parallel"`
+	Coverage        float64       `json:"coverage"`
+	CoverageChange  float64       `json:"coverageChange"`
+	BaseBuildID     uint          `json:"baseBuildID"`
+	BaseBuildNumber int           `json:"baseBuildNumber"`
+	CommitMessage   string        `json:"commitMessage"`
+	AuthorName      string        `json:"authorName"`
+	AuthorEmail     string        `json:"authorEmail"`
+	SourceFiles     []*SourceFile `json:"sourceFiles,omitempty"`
+	Jobs            []*Job        `json:"jobs,omitempty"`
+	CreatedAt       time.Time     `json:"createdAt"`
+	FinishedAt      time.Time     `json:"finishedAt,omitempty"` // zero if not yet finished
 }
 
 // BuildStore persists builds and jobs.

@@ -107,6 +107,7 @@ func TestBuildStoreUpdateAndLatestOnBranch(t *testing.T) {
 	}
 	first.Status = core.BuildDone
 	first.Coverage = 0.8
+	first.BaseBuildNumber = 7
 	first.SourceFiles = []*core.SourceFile{{Name: "a.go", Coverage: []*int{intPtr(1)}}}
 	if err := store.Update(first); err != nil {
 		t.Fatal(err)
@@ -119,6 +120,9 @@ func TestBuildStoreUpdateAndLatestOnBranch(t *testing.T) {
 	}
 	if got.Status != core.BuildDone || got.Coverage != 0.8 {
 		t.Fatal("status/coverage not persisted")
+	}
+	if got.BaseBuildNumber != 7 {
+		t.Fatalf("baseBuildNumber = %d, want 7", got.BaseBuildNumber)
 	}
 	if len(got.SourceFiles) != 1 || got.SourceFiles[0].Name != "a.go" {
 		t.Fatal("merged source files not persisted")

@@ -42,7 +42,7 @@ func TestFinalizePushBuildComputesDelta(t *testing.T) {
 		{SourceFiles: []*core.SourceFile{{Name: "a.go", Coverage: []*int{p(1), p(0)}}}},
 	}, nil)
 	builds.EXPECT().LatestOnBranch(uint(1), "master", uint(5)).Return(
-		&core.Build{ID: 1, Coverage: 0.25}, nil,
+		&core.Build{ID: 1, Number: 1, Coverage: 0.25}, nil,
 	)
 	builds.EXPECT().Update(gomock.Any()).DoAndReturn(func(b *core.Build) error {
 		if b.Status != core.BuildDone {
@@ -56,6 +56,9 @@ func TestFinalizePushBuildComputesDelta(t *testing.T) {
 		}
 		if b.BaseBuildID != 1 {
 			t.Fatalf("baseBuildID = %d, want 1", b.BaseBuildID)
+		}
+		if b.BaseBuildNumber != 1 {
+			t.Fatalf("baseBuildNumber = %d, want 1", b.BaseBuildNumber)
 		}
 		return nil
 	})

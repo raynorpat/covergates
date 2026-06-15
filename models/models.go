@@ -39,6 +39,7 @@ func init() {
 		&Repo{},
 		&RepoSetting{},
 		&RepoHook{},
+		&PullRequestComment{},
 		&OAuthToken{},
 		&Build{},
 		&Job{},

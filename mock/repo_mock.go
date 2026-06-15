@@ -169,6 +169,35 @@ func (mr *MockRepoStoreMockRecorder) UpdateCreator(arg0, arg1 interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCreator", reflect.TypeOf((*MockRepoStore)(nil).UpdateCreator), arg0, arg1)
 }
 
+// FindPullRequestComment mocks base method
+func (m *MockRepoStore) FindPullRequestComment(arg0 uint, arg1 int) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindPullRequestComment", arg0, arg1)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindPullRequestComment indicates an expected call of FindPullRequestComment
+func (mr *MockRepoStoreMockRecorder) FindPullRequestComment(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindPullRequestComment", reflect.TypeOf((*MockRepoStore)(nil).FindPullRequestComment), arg0, arg1)
+}
+
+// UpdatePullRequestComment mocks base method
+func (m *MockRepoStore) UpdatePullRequestComment(arg0 uint, arg1, arg2 int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePullRequestComment", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePullRequestComment indicates an expected call of UpdatePullRequestComment
+func (mr *MockRepoStoreMockRecorder) UpdatePullRequestComment(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePullRequestComment", reflect.TypeOf((*MockRepoStore)(nil).UpdatePullRequestComment), arg0, arg1, arg2)
+}
+
 // UpdateHook mocks base method
 func (m *MockRepoStore) UpdateHook(arg0 *core.Repo, arg1 *core.Hook) error {
 	m.ctrl.T.Helper()

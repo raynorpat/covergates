@@ -55,6 +55,11 @@ type RepoStore interface {
 	UpdateSetting(repo *Repo, setting *RepoSetting) error
 	FindHook(repo *Repo) (*Hook, error)
 	UpdateHook(repo *Repo, hook *Hook) error
+	// FindPullRequestComment returns the tracked SCM comment ID for a repo's PR,
+	// or 0 (with nil error) when none has been recorded.
+	FindPullRequestComment(repoID uint, number int) (int, error)
+	// UpdatePullRequestComment records the SCM comment ID for a repo's PR.
+	UpdatePullRequestComment(repoID uint, number, commentID int) error
 }
 
 // FullName is namespace+name

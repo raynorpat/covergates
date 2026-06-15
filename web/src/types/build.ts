@@ -8,6 +8,14 @@ export interface Job {
   id: number
   serviceJobID: string
   coverage: number
+  flag: string
+}
+
+export interface FileChange {
+  path: string
+  added: boolean
+  renamed: boolean
+  deleted: boolean
 }
 
 export type BuildStatus = 'processing' | 'done' | 'errored'

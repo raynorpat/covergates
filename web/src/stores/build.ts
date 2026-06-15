@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import http from '@/plugins/http'
-import type { Build } from '@/types/build'
+import type { Build, FileChange } from '@/types/build'
 
 export const useBuildStore = defineStore('build', () => {
   const list = ref<Build[]>([])
@@ -28,5 +28,10 @@ export const useBuildStore = defineStore('build', () => {
     return typeof data === 'string' ? data : String(data)
   }
 
-  return { list, current, base, fetchList, fetchBuild, fetchSource }
+  async function fetchChanges(repoPath: string, number: number): Promise<FileChange[]> {
+    const { data } = await http.get<FileChange[]>(`${repoPath}/pulls/${number}/changes`)
+    return data ?? []
+  }
+
+  return { list, current, base, fetchList, fetchBuild, fetchSource, fetchChanges }
 })

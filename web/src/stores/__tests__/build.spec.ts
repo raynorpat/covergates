@@ -48,4 +48,12 @@ describe('build store', () => {
     expect(text).toBe('line1\nline2')
     expect(http.get).toHaveBeenCalledWith(`${repoPath}/content/a/b.go`, { params: { gitref: 'sha1' } })
   })
+
+  it('fetchChanges hits the pulls changes endpoint', async () => {
+    ;(http.get as any).mockResolvedValue({ data: [{ path: 'a.go', added: true, renamed: false, deleted: false }] })
+    const s = useBuildStore()
+    const changes = await s.fetchChanges(repoPath, 3)
+    expect(changes).toHaveLength(1)
+    expect(http.get).toHaveBeenCalledWith(`${repoPath}/pulls/3/changes`)
+  })
 })

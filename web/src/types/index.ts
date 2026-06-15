@@ -16,3 +16,18 @@ export interface Repository {
   Private: boolean
   SCM: SCM
 }
+
+export interface TopRepo {
+  scm: SCM
+  namespace: string
+  name: string
+  reportID: string
+  coverage: number
+}
+
+export interface RepoStats {
+  repoCount: number
+  activatedCount: number
+  averageCoverage: number
+  topRepos: TopRepo[]
+}

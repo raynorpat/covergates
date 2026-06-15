@@ -38,4 +38,34 @@ describe('repository store', () => {
     await store.updateSetting('/api/v1/repos/github/o/r', s)
     expect(http.post).toHaveBeenCalledWith('/api/v1/repos/github/o/r/setting', s)
   })
+
+  it('ensureSynced syncs when the list is empty, once per session', async () => {
+    ;(http.get as any).mockResolvedValue({ data: [] }) // empty list
+    ;(http.patch as any).mockResolvedValue({ data: 'ok' })
+    const store = useRepositoryStore()
+    await store.ensureSynced()
+    expect(http.patch).toHaveBeenCalledWith('/api/v1/user/repos') // synced because empty
+    ;(http.patch as any).mockClear()
+    await store.ensureSynced() // second call is a no-op (once guard)
+    expect(http.patch).not.toHaveBeenCalled()
+  })
+
+  it('ensureSynced does not sync when repos already exist', async () => {
+    ;(http.get as any).mockResolvedValue({ data: [
+      { ID: 1, URL: 'u', ReportID: 'x', NameSpace: 'o', Name: 'a', Branch: 'm', Private: false, SCM: 'github' }
+    ] })
+    ;(http.patch as any).mockResolvedValue({ data: 'ok' })
+    const store = useRepositoryStore()
+    await store.ensureSynced()
+    expect(http.patch).not.toHaveBeenCalled()
+  })
+
+  it('fetchStats loads the stats endpoint', async () => {
+    const stats = { repoCount: 2, activatedCount: 1, averageCoverage: 0.8, topRepos: [] }
+    ;(http.get as any).mockResolvedValue({ data: stats })
+    const store = useRepositoryStore()
+    await store.fetchStats()
+    expect(http.get).toHaveBeenCalledWith('/api/v1/user/stats')
+    expect(store.stats).toEqual(stats)
+  })
 })

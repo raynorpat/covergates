@@ -46,6 +46,7 @@ func TestBuildStoreAddJobAndJobs(t *testing.T) {
 	job := &core.Job{
 		ServiceJobID: "job-1",
 		Coverage:     0.5,
+		Flag:         "unit",
 		SourceFiles: []*core.SourceFile{
 			{Name: "a.go", Coverage: []*int{intPtr(1), nil, intPtr(0)}},
 		},
@@ -69,6 +70,9 @@ func TestBuildStoreAddJobAndJobs(t *testing.T) {
 	}
 	if jobs[0].SourceFiles[0].Coverage[1] != nil {
 		t.Fatal("nil coverage element should round-trip as nil")
+	}
+	if jobs[0].Flag != "unit" {
+		t.Fatalf("flag = %q, want unit", jobs[0].Flag)
 	}
 }
 

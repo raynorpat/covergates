@@ -42,6 +42,7 @@ type Job struct {
 	ServiceJobID     string
 	ServiceJobNumber string
 	Coverage         float64
+	Flag             string
 	SourceFilesData  []byte
 }
 
@@ -87,6 +88,7 @@ func (store *BuildStore) AddJob(b *core.Build, j *core.Job) error {
 		ServiceJobID:     j.ServiceJobID,
 		ServiceJobNumber: j.ServiceJobNumber,
 		Coverage:         j.Coverage,
+		Flag:             j.Flag,
 		SourceFilesData:  data,
 	}
 	if err := store.DB.Session().Create(m).Error; err != nil {
@@ -251,6 +253,7 @@ func (m *Job) toCoreJob() *core.Job {
 		ServiceJobID:     m.ServiceJobID,
 		ServiceJobNumber: m.ServiceJobNumber,
 		Coverage:         m.Coverage,
+		Flag:             m.Flag,
 		CreatedAt:        m.CreatedAt,
 	}
 	if len(m.SourceFilesData) > 0 {

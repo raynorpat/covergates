@@ -35,6 +35,7 @@ type Job struct {
 	ServiceJobID     string        `json:"serviceJobID"`
 	ServiceJobNumber string        `json:"serviceJobNumber"`
 	Coverage         float64       `json:"coverage"`
+	Flag             string        `json:"flag"`
 	SourceFiles      []*SourceFile `json:"-"`
 	CreatedAt        time.Time     `json:"createdAt"`
 }

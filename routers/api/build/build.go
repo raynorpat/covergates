@@ -49,6 +49,7 @@ func HandleJobs(
 			ServiceJobNumber: payload.ServiceJobNumber,
 			SourceFiles:      payload.SourceFiles,
 			Coverage:         buildmod.Coverage(payload.SourceFiles),
+			Flag:             payload.FlagName,
 		}
 		if err := buildStore.AddJob(build, job); err != nil {
 			c.JSON(500, gin.H{"message": err.Error()})

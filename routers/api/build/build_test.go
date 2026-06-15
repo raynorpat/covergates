@@ -38,13 +38,19 @@ func TestHandleJobsSingleFinalizes(t *testing.T) {
 	repos.EXPECT().Find(&core.Repo{Token: "tok"}).Return(repo, nil)
 	builds.EXPECT().FindByServiceNumber(uint(1), "5").Return(nil, gorm.ErrRecordNotFound)
 	builds.EXPECT().Create(gomock.Any()).DoAndReturn(func(b *core.Build) error { b.ID = 9; return nil })
-	builds.EXPECT().AddJob(gomock.Any(), gomock.Any()).DoAndReturn(func(b *core.Build, j *core.Job) error { j.ID = 3; return nil })
+	builds.EXPECT().AddJob(gomock.Any(), gomock.Any()).DoAndReturn(func(b *core.Build, j *core.Job) error {
+		if j.Flag != "unit" {
+			t.Fatalf("flag = %q, want unit", j.Flag)
+		}
+		j.ID = 3
+		return nil
+	})
 	svc.EXPECT().Finalize(gomock.Any(), repo, gomock.Any()).Return(nil)
 
 	r := gin.New()
 	r.POST("/api/v1/jobs", HandleJobs(newConfig(), repos, builds, svc))
 
-	body := `{"repo_token":"tok","service_number":"5",
+	body := `{"repo_token":"tok","service_number":"5","flag_name":"unit",
 		"git":{"branch":"master","head":{"id":"sha"}},
 		"source_files":[{"name":"a.go","coverage":[1,0]}]}`
 	req := httptest.NewRequest("POST", "/api/v1/jobs", strings.NewReader(body))

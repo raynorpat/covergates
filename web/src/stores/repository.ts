@@ -25,9 +25,14 @@ export const useRepositoryStore = defineStore('repository', () => {
   async function ensureSynced() {
     if (autoSynced.value) return
     autoSynced.value = true
-    await fetchList()
-    if (list.value.length === 0) {
-      await synchronize()
+    try {
+      await fetchList()
+      if (list.value.length === 0) {
+        await synchronize()
+      }
+    } catch (e) {
+      autoSynced.value = false // release the guard so a later attempt can retry
+      throw e
     }
   }
 

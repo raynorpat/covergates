@@ -14,7 +14,7 @@ const vuetify = createVuetify({ components, directives })
 const router = createRouter({ history: createMemoryHistory(), routes: [
   { path: '/', component: { template: '<div/>' } },
   { path: '/repos', component: { template: '<div/>' } },
-  { path: '/report/:scm/:namespace/:name/builds', component: { template: '<div/>' } }
+  { path: '/report/:scm/:namespace/:name', component: { template: '<div/>' } }
 ] })
 
 function routeGet(map: Record<string, unknown>) {

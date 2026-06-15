@@ -60,6 +60,16 @@ describe('repository store', () => {
     expect(http.patch).not.toHaveBeenCalled()
   })
 
+  it('ensureSynced releases its guard on failure so it can retry', async () => {
+    ;(http.get as any).mockRejectedValueOnce(new Error('boom')) // first attempt fails
+    const store = useRepositoryStore()
+    await expect(store.ensureSynced()).rejects.toThrow('boom')
+    ;(http.get as any).mockResolvedValue({ data: [] }) // recovers; now empty -> syncs
+    ;(http.patch as any).mockResolvedValue({ data: 'ok' })
+    await store.ensureSynced()
+    expect(http.patch).toHaveBeenCalledWith('/api/v1/user/repos')
+  })
+
   it('fetchStats loads the stats endpoint', async () => {
     const stats = { repoCount: 2, activatedCount: 1, averageCoverage: 0.8, topRepos: [] }
     ;(http.get as any).mockResolvedValue({ data: stats })

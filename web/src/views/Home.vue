@@ -25,7 +25,7 @@ onMounted(async () => {
 })
 
 function openRepo(r: { scm: string; namespace: string; name: string }) {
-  router.push(`/report/${r.scm}/${r.namespace}/${r.name}/builds`)
+  router.push(`/report/${r.scm}/${r.namespace}/${r.name}`)
 }
 </script>
 

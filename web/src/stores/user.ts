@@ -5,6 +5,7 @@ import type { User } from '@/types'
 
 export const useUserStore = defineStore('user', () => {
   const current = ref<User | null>(null)
+  const scm = ref<Record<string, boolean>>({})
   const isAuthenticated = computed(() => current.value !== null)
 
   async function fetch() {
@@ -16,5 +17,14 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  return { current, isAuthenticated, fetch }
+  async function fetchScm() {
+    try {
+      const { data } = await http.get<Record<string, boolean>>('/api/v1/user/scm')
+      scm.value = data ?? {}
+    } catch {
+      scm.value = {}
+    }
+  }
+
+  return { current, scm, isAuthenticated, fetch, fetchScm }
 })

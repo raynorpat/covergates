@@ -24,4 +24,12 @@ describe('user store', () => {
     expect(store.current).toBeNull()
     expect(store.isAuthenticated).toBe(false)
   })
+
+  it('fetchScm populates provider map', async () => {
+    ;(http.get as any).mockResolvedValue({ data: { github: true, gitea: false } })
+    const store = useUserStore()
+    await store.fetchScm()
+    expect(store.scm.github).toBe(true)
+    expect(store.scm.gitea).toBe(false)
+  })
 })

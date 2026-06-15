@@ -41,7 +41,7 @@ func (n *CommentNotifier) Notify(ctx context.Context, repo *core.Repo, build *co
 	if err != nil {
 		return err
 	}
-	body := commentBody(build, verdict, changes, coverageByPath(build), n.target(repo, build))
+	body := commentBody(build, verdict, changes, coverageByPath(build), buildURL(n.Config, repo, build))
 
 	if prev, err := n.Repos.FindPullRequestComment(repo.ID, build.PullRequest); err == nil && prev > 0 {
 		// Best-effort delete of the previous comment; it may already be gone.
@@ -52,10 +52,6 @@ func (n *CommentNotifier) Notify(ctx context.Context, repo *core.Repo, build *co
 		return err
 	}
 	return n.Repos.UpdatePullRequestComment(repo.ID, build.PullRequest, id)
-}
-
-func (n *CommentNotifier) target(repo *core.Repo, build *core.Build) string {
-	return fmt.Sprintf("%s/report/%s/%s/builds/%d", n.Config.Server.URL(), repo.SCM, repo.FullName(), build.Number)
 }
 
 // coverageByPath maps each build source file to its coverage ratio in [0,1],
@@ -108,14 +104,15 @@ func commentBody(build *core.Build, verdict *core.Verdict,
 func statusBadge(state core.StatusState) (emoji, label string) {
 	switch state {
 	case core.StatusSuccess:
-		return "✅", "passed"
+		emoji = "✅"
 	case core.StatusFailure:
-		return "❌", "failed"
+		emoji = "❌"
 	case core.StatusError:
-		return "⚠️", "errored"
+		emoji = "⚠️"
 	default:
-		return "⏳", "pending"
+		emoji = "⏳"
 	}
+	return emoji, statusLabel(state)
 }
 
 func coverageCell(ch *core.FileChange, cov map[string]float64) string {

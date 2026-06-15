@@ -2,7 +2,6 @@ package notify
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/covergates/covergates/config"
 	"github.com/covergates/covergates/core"
@@ -33,11 +32,8 @@ func (n *StatusNotifier) Notify(ctx context.Context, repo *core.Repo, build *cor
 		State:  verdict.State,
 		Label:  "coverage/covergates",
 		Desc:   verdict.Description,
-		Target: n.buildURL(repo, build),
+		Target: buildURL(n.Config, repo, build),
 	}
 	return client.Repositories().CreateStatus(ctx, user, repo.FullName(), build.Commit, status)
 }
 
-func (n *StatusNotifier) buildURL(repo *core.Repo, build *core.Build) string {
-	return fmt.Sprintf("%s/report/%s/%s/builds/%d", n.Config.Server.URL(), repo.SCM, repo.FullName(), build.Number)
-}

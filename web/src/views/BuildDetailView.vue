@@ -6,6 +6,9 @@ import { is401, isStatus, loginUrl } from '@/lib/auth'
 import { useBuildStore } from '@/stores/build'
 import BuildSummary from '@/components/BuildSummary.vue'
 import FileCoverageTable from '@/components/FileCoverageTable.vue'
+import FileCoverageTree from '@/components/FileCoverageTree.vue'
+import JobsPanel from '@/components/JobsPanel.vue'
+import ChangedFilesPanel from '@/components/ChangedFilesPanel.vue'
 
 const route = useRoute()
 const store = useBuildStore()
@@ -13,6 +16,7 @@ const loading = ref(false)
 const error = ref('')
 const needLogin = ref(false)
 const notFound = ref(false)
+const fileView = ref<'flat' | 'tree'>('flat')
 
 const scm = computed(() => String(route.params.scm))
 const namespace = computed(() => String(route.params.namespace))
@@ -53,7 +57,22 @@ watch(number, load)
     <v-alert v-else-if="error" type="warning" variant="tonal">{{ error }}</v-alert>
     <template v-else-if="store.current">
       <BuildSummary :build="store.current" />
-      <FileCoverageTable :build="store.current" :base="store.base" :build-route="buildRoute" />
+      <JobsPanel v-if="store.current.jobs && store.current.jobs.length" :jobs="store.current.jobs" />
+      <ChangedFilesPanel
+        v-if="store.current.pullRequest > 0"
+        :build="store.current"
+        :repo-path="repoPath"
+        :build-route="buildRoute"
+        :login-redirect="$route.fullPath"
+      />
+      <div class="d-flex justify-end mb-2">
+        <v-btn-toggle v-model="fileView" density="compact" mandatory>
+          <v-btn value="flat" size="small">Flat</v-btn>
+          <v-btn value="tree" size="small">Tree</v-btn>
+        </v-btn-toggle>
+      </div>
+      <FileCoverageTable v-if="fileView === 'flat'" :build="store.current" :base="store.base" :build-route="buildRoute" />
+      <FileCoverageTree v-else :build="store.current" :build-route="buildRoute" />
     </template>
   </v-container>
 </template>

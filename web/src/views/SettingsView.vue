@@ -79,6 +79,7 @@ onMounted(load)
       <WebhookButton :repo-path="repoPath" />
       <v-card class="pa-4 mb-4">
         <div class="text-h6 mb-2">Upload token</div>
+        <p class="text-body-2 text-medium-emphasis mb-2">Hidden for security — click to reveal.</p>
         <v-btn variant="text" :loading="tokenCtl.busy.value" @click="tokenCtl.revealed.value ? tokenCtl.rotate() : tokenCtl.reveal()">
           {{ tokenCtl.revealed.value ? 'Rotate token' : 'Show token' }}
         </v-btn>

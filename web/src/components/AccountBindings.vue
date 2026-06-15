@@ -26,7 +26,7 @@ const bindUrl = `${basePath()}/login?bind`
 </script>
 
 <template>
-  <v-card class="pa-4">
+  <v-card class="pa-4 h-100">
     <div class="text-h6 mb-2">Linked accounts</div>
     <v-list>
       <v-list-item v-for="p in rows" :key="p.scm" :title="p.label" :prepend-icon="p.icon">

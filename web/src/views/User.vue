@@ -9,9 +9,9 @@ onMounted(() => { if (!user.current) user.fetch() })
 
 <template>
   <v-container class="py-8">
-    <v-row justify="center">
+    <v-row justify="center" align="stretch">
       <v-col cols="12" md="6">
-        <v-card class="pa-6">
+        <v-card class="pa-6 h-100">
           <div class="d-flex align-center mb-4">
             <v-avatar size="64" class="mr-4">
               <v-img v-if="user.current?.avatar" :src="user.current.avatar" />

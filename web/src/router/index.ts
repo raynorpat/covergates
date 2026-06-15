@@ -9,6 +9,7 @@ import BuildsView from '@/views/BuildsView.vue'
 import BuildDetailView from '@/views/BuildDetailView.vue'
 import SourceView from '@/views/SourceView.vue'
 import SettingsView from '@/views/SettingsView.vue'
+import BranchesView from '@/views/BranchesView.vue'
 
 const router = createRouter({
   history: createWebHistory(basePath() + '/'),
@@ -19,6 +20,7 @@ const router = createRouter({
     { path: '/user', name: 'user', component: User, meta: { requiresAuth: true } },
     { path: '/report/:scm/:namespace/:name', name: 'repo', component: BuildsView },
     { path: '/report/:scm/:namespace/:name/settings', name: 'settings', component: SettingsView, meta: { requiresAuth: true } },
+    { path: '/report/:scm/:namespace/:name/branches', name: 'branches', component: BranchesView },
     { path: '/report/:scm/:namespace/:name/builds/:number', name: 'build', component: BuildDetailView },
     { path: '/report/:scm/:namespace/:name/builds/:number/source/:path(.*)*', name: 'source', component: SourceView },
     { path: '/:pathMatch(.*)*', redirect: '/' }

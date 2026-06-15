@@ -46,9 +46,11 @@ func TestHandleJobsSingleFinalizes(t *testing.T) {
 		return nil
 	})
 	svc.EXPECT().Finalize(gomock.Any(), repo, gomock.Any()).Return(nil)
+	notify := mock.NewMockNotifyService(ctrl)
+	notify.EXPECT().Notify(gomock.Any(), repo, gomock.Any()).Return(nil)
 
 	r := gin.New()
-	r.POST("/api/v1/jobs", HandleJobs(newConfig(), repos, builds, svc))
+	r.POST("/api/v1/jobs", HandleJobs(newConfig(), repos, builds, svc, notify))
 
 	body := `{"repo_token":"tok","service_number":"5","flag_name":"unit",
 		"git":{"branch":"master","head":{"id":"sha"}},
@@ -74,9 +76,10 @@ func TestHandleJobsParallelDoesNotFinalize(t *testing.T) {
 	builds.EXPECT().FindByServiceNumber(uint(1), "5").Return(&core.Build{ID: 9, RepoID: 1}, nil)
 	builds.EXPECT().AddJob(gomock.Any(), gomock.Any()).Return(nil)
 	// No Finalize expected.
+	notify := mock.NewMockNotifyService(ctrl)
 
 	r := gin.New()
-	r.POST("/api/v1/jobs", HandleJobs(newConfig(), repos, builds, svc))
+	r.POST("/api/v1/jobs", HandleJobs(newConfig(), repos, builds, svc, notify))
 	body := `{"repo_token":"tok","service_number":"5","parallel":true,
 		"source_files":[{"name":"a.go","coverage":[1]}]}`
 	req := httptest.NewRequest("POST", "/api/v1/jobs", strings.NewReader(body))
@@ -95,9 +98,10 @@ func TestHandleJobsBadToken(t *testing.T) {
 	svc := mock.NewMockBuildService(ctrl)
 
 	repos.EXPECT().Find(&core.Repo{Token: "bad"}).Return(nil, gorm.ErrRecordNotFound)
+	notify := mock.NewMockNotifyService(ctrl)
 
 	r := gin.New()
-	r.POST("/api/v1/jobs", HandleJobs(newConfig(), repos, builds, svc))
+	r.POST("/api/v1/jobs", HandleJobs(newConfig(), repos, builds, svc, notify))
 	body := `{"repo_token":"bad","source_files":[{"name":"a.go","coverage":[1]}]}`
 	req := httptest.NewRequest("POST", "/api/v1/jobs", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
@@ -118,9 +122,11 @@ func TestHandleWebhookDone(t *testing.T) {
 	repos.EXPECT().Find(&core.Repo{Token: "tok"}).Return(repo, nil)
 	builds.EXPECT().FindByServiceNumber(uint(1), "5").Return(&core.Build{ID: 9, RepoID: 1}, nil)
 	svc.EXPECT().Finalize(gomock.Any(), repo, gomock.Any()).Return(nil)
+	notify := mock.NewMockNotifyService(ctrl)
+	notify.EXPECT().Notify(gomock.Any(), repo, gomock.Any()).Return(nil)
 
 	r := gin.New()
-	r.POST("/webhook", HandleWebhook(repos, builds, svc))
+	r.POST("/webhook", HandleWebhook(repos, builds, svc, notify))
 	body := `{"payload":{"build_num":"5","status":"done"}}`
 	req := httptest.NewRequest("POST", "/webhook?repo_token=tok", bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
@@ -139,9 +145,10 @@ func TestHandleWebhookUnknownBuild(t *testing.T) {
 
 	repos.EXPECT().Find(&core.Repo{Token: "tok"}).Return(&core.Repo{ID: 1}, nil)
 	builds.EXPECT().FindByServiceNumber(uint(1), "9").Return(nil, gorm.ErrRecordNotFound)
+	notify := mock.NewMockNotifyService(ctrl)
 
 	r := gin.New()
-	r.POST("/webhook", HandleWebhook(repos, builds, svc))
+	r.POST("/webhook", HandleWebhook(repos, builds, svc, notify))
 	body := `{"payload":{"build_num":"9","status":"done"}}`
 	req := httptest.NewRequest("POST", "/webhook?repo_token=tok", bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
@@ -177,9 +184,10 @@ func TestHandleWebhookBadJSON(t *testing.T) {
 	svc := mock.NewMockBuildService(ctrl)
 
 	repos.EXPECT().Find(&core.Repo{Token: "tok"}).Return(&core.Repo{ID: 1}, nil)
+	notify := mock.NewMockNotifyService(ctrl)
 
 	r := gin.New()
-	r.POST("/webhook", HandleWebhook(repos, builds, svc))
+	r.POST("/webhook", HandleWebhook(repos, builds, svc, notify))
 	req := httptest.NewRequest("POST", "/webhook?repo_token=tok", bytes.NewBufferString("not json"))
 	req.Header.Set("Content-Type", "application/json")
 

@@ -35,6 +35,7 @@ func provideRouter(
 	oauthStore core.OAuthStore,
 	buildStore core.BuildStore,
 	buildService core.BuildService,
+	notifyService core.NotifyService,
 ) *routers.Routers {
 	return &routers.Routers{
 		Config:          config,
@@ -52,5 +53,6 @@ func provideRouter(
 		OAuthStore:      oauthStore,
 		BuildStore:      buildStore,
 		BuildService:    buildService,
+		NotifyService:   notifyService,
 	}
 }

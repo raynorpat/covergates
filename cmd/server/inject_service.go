@@ -7,6 +7,7 @@ import (
 	"github.com/covergates/covergates/modules/charts"
 	"github.com/covergates/covergates/modules/git"
 	"github.com/covergates/covergates/modules/hook"
+	notifymod "github.com/covergates/covergates/modules/notify"
 	"github.com/covergates/covergates/modules/oauth"
 	"github.com/covergates/covergates/modules/repo"
 	"github.com/covergates/covergates/modules/report"
@@ -25,6 +26,7 @@ var serviceSet = wire.NewSet(
 	provideOAuthService,
 	provideRepoService,
 	provideBuildService,
+	provideNotifyService,
 )
 
 func provideSCMService(
@@ -102,5 +104,22 @@ func provideBuildService(
 		Builds: buildStore,
 		Repos:  repoStore,
 		SCM:    scmService,
+	}
+}
+
+func provideNotifyService(
+	config *config.Config,
+	scmService core.SCMService,
+	repoStore core.RepoStore,
+) core.NotifyService {
+	return &notifymod.Service{
+		Repos: repoStore,
+		Notifiers: []core.Notifier{
+			&notifymod.StatusNotifier{
+				SCM:    scmService,
+				Repos:  repoStore,
+				Config: config,
+			},
+		},
 	}
 }

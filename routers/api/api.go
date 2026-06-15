@@ -41,6 +41,7 @@ type Router struct {
 	HookService   core.HookService
 	OAuthService  core.OAuthService
 	BuildService  core.BuildService
+	NotifyService core.NotifyService
 	// store
 	UserStore   core.UserStore
 	ReportStore core.ReportStore
@@ -63,7 +64,7 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 	checkLogin := request.CheckLogin(r.Session, r.OAuthService)
 	e.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	g := e.Group("/api/v1")
-	g.POST("/jobs", build.HandleJobs(r.Config, r.RepoStore, r.BuildStore, r.BuildService))
+	g.POST("/jobs", build.HandleJobs(r.Config, r.RepoStore, r.BuildStore, r.BuildService, r.NotifyService))
 	{
 		g := g.Group("/user")
 		g.GET("", checkLogin, user.HandleGet())
@@ -126,5 +127,5 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 		g.GET("/builds", build.HandleList(r.SCMService, r.RepoStore, r.BuildStore))
 		g.GET("/builds/:number", build.HandleGet(r.SCMService, r.RepoStore, r.BuildStore))
 	}
-	e.POST("/webhook", build.HandleWebhook(r.RepoStore, r.BuildStore, r.BuildService))
+	e.POST("/webhook", build.HandleWebhook(r.RepoStore, r.BuildStore, r.BuildService, r.NotifyService))
 }

@@ -23,6 +23,7 @@ func HandleJobs(
 	repoStore core.RepoStore,
 	buildStore core.BuildStore,
 	buildService core.BuildService,
+	notifyService core.NotifyService,
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		payload, err := parsePayload(c)
@@ -60,6 +61,7 @@ func HandleJobs(
 				c.JSON(500, gin.H{"message": err.Error()})
 				return
 			}
+			_ = notifyService.Notify(c.Request.Context(), repo, build)
 		}
 		url := fmt.Sprintf("%s/report/%s/%s", cfg.Server.URL(), repo.SCM, repo.FullName())
 		c.JSON(200, gin.H{"id": job.ID, "url": url, "message": "Job created"})
@@ -82,6 +84,7 @@ func HandleWebhook(
 	repoStore core.RepoStore,
 	buildStore core.BuildStore,
 	buildService core.BuildService,
+	notifyService core.NotifyService,
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Query("repo_token")
@@ -108,6 +111,7 @@ func HandleWebhook(
 			c.JSON(500, gin.H{"message": err.Error()})
 			return
 		}
+		_ = notifyService.Notify(c.Request.Context(), repo, build)
 		c.JSON(200, gin.H{"done": true})
 	}
 }

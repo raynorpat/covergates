@@ -3,10 +3,13 @@ import { setActivePinia, createPinia } from 'pinia'
 import http from '@/plugins/http'
 import { useRepositoryStore } from '@/stores/repository'
 
-vi.mock('@/plugins/http', () => ({ default: { get: vi.fn(), patch: vi.fn() }, errorMessage: (e: unknown) => String(e) }))
+vi.mock('@/plugins/http', () => ({ default: { get: vi.fn(), patch: vi.fn(), post: vi.fn() }, errorMessage: (e: unknown) => String(e) }))
 
 describe('repository store', () => {
-  beforeEach(() => setActivePinia(createPinia()))
+  beforeEach(() => {
+    vi.clearAllMocks()
+    setActivePinia(createPinia())
+  })
 
   it('fetchList() populates list', async () => {
     ;(http.get as any).mockResolvedValue({ data: [{ ID: 1, Name: 'r', NameSpace: 'o' }] })
@@ -23,5 +26,16 @@ describe('repository store', () => {
     await store.synchronize()
     expect(http.patch).toHaveBeenCalledWith('/api/v1/user/repos')
     expect(http.get).toHaveBeenCalledWith('/api/v1/user/repos')
+  })
+
+  it('fetchSetting and updateSetting hit the setting endpoint', async () => {
+    const s = { filters: ['a'], mergePR: true, updateAction: 'merge', protected: false }
+    ;(http.get as any).mockResolvedValue({ data: s })
+    ;(http.post as any).mockResolvedValue({ data: s })
+    const store = useRepositoryStore()
+    await store.fetchSetting('/api/v1/repos/github/o/r')
+    expect(store.setting).toEqual(s)
+    await store.updateSetting('/api/v1/repos/github/o/r', s)
+    expect(http.post).toHaveBeenCalledWith('/api/v1/repos/github/o/r/setting', s)
   })
 })

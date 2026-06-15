@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/covergates/covergates/config"
@@ -44,6 +46,7 @@ func (n *SlackNotifier) Notify(ctx context.Context, repo *core.Repo, build *core
 		return err
 	}
 	defer resp.Body.Close()
+	_, _ = io.Copy(ioutil.Discard, resp.Body) // drain so the connection can be reused
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return fmt.Errorf("slack webhook returned status %d", resp.StatusCode)
 	}

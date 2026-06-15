@@ -54,4 +54,18 @@ describe('RepoListItem', () => {
     expect(http.get).toHaveBeenCalledWith('/api/v1/repos/github/o/r/token')
     expect(w.html()).toContain('secret123')
   })
+
+  it('activated repo rotates token via PATCH /token', async () => {
+    ;(http.get as any).mockResolvedValue({ data: { token: 'old' } })
+    ;(http.patch as any).mockResolvedValue({ data: { token: 'new456' } })
+    const w = mountItem({ ...baseRepo, ReportID: 'abc' })
+    const reveal = w.findAll('button').find((b) => b.text().includes('Show token'))!
+    await reveal.trigger('click')
+    await Promise.resolve(); await Promise.resolve()
+    const rotate = w.findAll('button').find((b) => b.text().includes('Rotate token'))!
+    await rotate.trigger('click')
+    await Promise.resolve(); await Promise.resolve()
+    expect(http.patch).toHaveBeenCalledWith('/api/v1/repos/github/o/r/token')
+    expect(w.html()).toContain('new456')
+  })
 })

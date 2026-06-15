@@ -43,6 +43,9 @@ func TestStatusLabel(t *testing.T) {
 	if statusLabel(core.StatusError) != "errored" {
 		t.Error("error should be errored")
 	}
+	if statusLabel(core.StatusPending) != "pending" {
+		t.Error("pending should be pending")
+	}
 }
 
 func TestSummaryLineAndBuildURL(t *testing.T) {

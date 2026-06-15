@@ -27,6 +27,11 @@ type RepoSetting struct {
 	UpdateAction     ReportUpdateAction `json:"updateAction"`
 	// Protected project from unauthorized user upload report
 	Protected bool `json:"protected"`
+	// CoverageMinimum is the minimum total coverage percent (0..100); 0 disables the check.
+	CoverageMinimum float64 `json:"coverageMinimum"`
+	// CoverageDecreaseThreshold is the max allowed coverage drop in percentage
+	// points vs the base build; 0 means any decrease fails.
+	CoverageDecreaseThreshold float64 `json:"coverageDecreaseThreshold"`
 }
 
 // RepoService provides repository opperations

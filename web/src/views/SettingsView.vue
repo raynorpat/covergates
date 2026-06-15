@@ -8,6 +8,7 @@ import { useRepoToken } from '@/lib/useRepoToken'
 import type { Repository } from '@/types'
 import type { RepoSetting } from '@/types/setting'
 import SettingsGeneral from '@/components/SettingsGeneral.vue'
+import SettingsChecks from '@/components/SettingsChecks.vue'
 import WebhookButton from '@/components/WebhookButton.vue'
 import EmbedCard from '@/components/EmbedCard.vue'
 import UploadGuide from '@/components/UploadGuide.vue'
@@ -72,6 +73,7 @@ onMounted(load)
     <v-alert v-else-if="error" type="warning" variant="tonal">{{ error }}</v-alert>
     <template v-else-if="store.setting && repo">
       <SettingsGeneral :model-value="store.setting" :busy="saving" @save="save" />
+      <SettingsChecks :model-value="store.setting" :busy="saving" @save="save" />
       <WebhookButton :repo-path="repoPath" />
       <v-card class="pa-4 mb-4">
         <div class="text-h6 mb-2">Upload token</div>

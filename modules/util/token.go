@@ -5,10 +5,10 @@ import (
 	"encoding/hex"
 )
 
-// GenerateToken returns a random 40-character hex secret used as a
+// GenerateToken returns a random 32-character hex secret used as a
 // repository upload token.
 func GenerateToken() string {
-	b := make([]byte, 20)
+	b := make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {
 		panic(err)
 	}

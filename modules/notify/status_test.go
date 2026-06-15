@@ -29,12 +29,13 @@ func TestStatusNotifierPostsStatus(t *testing.T) {
 	build := &core.Build{Number: 12, Commit: "abc123"}
 	verdict := &core.Verdict{State: core.StatusSuccess, Description: "Coverage: 90.0%"}
 
-	store.EXPECT().Creator(repo).Return(&core.User{Login: "octocat"}, nil)
+	user := &core.User{Login: "octocat"}
+	store.EXPECT().Creator(repo).Return(user, nil)
 	scmService.EXPECT().Client(repo.SCM).Return(client, nil)
 	client.EXPECT().Repositories().Return(repos)
 	repos.EXPECT().CreateStatus(
 		gomock.Any(),
-		gomock.Any(),
+		user,
 		repo.FullName(),
 		"abc123",
 		gomock.AssignableToTypeOf(&core.Status{}),
@@ -45,8 +46,9 @@ func TestStatusNotifierPostsStatus(t *testing.T) {
 		if s.Label != "coverage/covergates" {
 			t.Errorf("label = %q", s.Label)
 		}
-		if s.Target == "" {
-			t.Error("expected non-empty target URL")
+		wantTarget := "http://localhost:8080/report/github/octocat/hello/builds/12"
+		if s.Target != wantTarget {
+			t.Errorf("target = %q, want %q", s.Target, wantTarget)
 		}
 		return nil
 	})

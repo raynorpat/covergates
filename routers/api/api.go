@@ -34,13 +34,13 @@ type Router struct {
 	Config  *config.Config
 	Session core.Session
 	// service
-	ChartService core.ChartService
-	SCMService      core.SCMService
-	RepoService     core.RepoService
-	ReportService   core.ReportService
-	HookService     core.HookService
-	OAuthService    core.OAuthService
-	BuildService    core.BuildService
+	ChartService  core.ChartService
+	SCMService    core.SCMService
+	RepoService   core.RepoService
+	ReportService core.ReportService
+	HookService   core.HookService
+	OAuthService  core.OAuthService
+	BuildService  core.BuildService
 	// store
 	UserStore   core.UserStore
 	ReportStore core.ReportStore
@@ -108,7 +108,8 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 			g.GET("/setting", repo.HandleGetSetting(r.RepoStore))
 			g.POST("/setting", repo.WithRepo(r.RepoStore), repo.HandleUpdateSetting(r.RepoStore, r.SCMService))
 			g.PATCH("/report", repo.HandleReportIDRenew(r.RepoStore, r.SCMService))
-			g.PATCH("/token", repo.HandleTokenRenew(r.RepoStore))
+			g.GET("/token", repo.HandleTokenGet(r.RepoStore, r.SCMService))
+			g.PATCH("/token", repo.HandleTokenRenew(r.RepoStore, r.SCMService))
 			g.GET("/files", repo.HandleGetFiles(r.SCMService))
 			g.GET("/content/*path", repo.HandleGetFileContent(r.SCMService))
 			g.POST("/hook/create", repo.WithRepo(r.RepoStore), repo.HandleHookCreate(r.HookService))

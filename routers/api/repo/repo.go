@@ -95,15 +95,42 @@ func HandleReportIDRenew(store core.RepoStore, service core.SCMService) gin.Hand
 	}
 }
 
+// HandleTokenGet returns the upload token of the repository
+// @Summary get repository upload token
+// @Tags Repository
+// @Param scm path string true "SCM"
+// @Param namespace path string true "Namespace"
+// @Param name path string true "name"
+// @Success 200 {object} object "{token}"
+// @Router /repos/{scm}/{namespace}/{name}/token [get]
+func HandleTokenGet(store core.RepoStore, service core.SCMService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		repo, err := store.Find(&core.Repo{
+			Name:      c.Param("name"),
+			NameSpace: c.Param("namespace"),
+			SCM:       core.SCMProvider(c.Param("scm")),
+		})
+		if err != nil {
+			c.String(404, "repository not found")
+			return
+		}
+		if !canAccessRepo(c, service, repo) {
+			c.String(403, "forbidden")
+			return
+		}
+		c.JSON(200, gin.H{"token": repo.Token})
+	}
+}
+
 // HandleTokenRenew generates a new upload token for the repository
 // @Summary renew repository upload token
 // @Tags Repository
 // @Param scm path string true "SCM"
 // @Param namespace path string true "Namespace"
 // @Param name path string true "name"
-// @Success 200 {object} core.Repo "updated repository"
+// @Success 200 {object} object "{token}"
 // @Router /repos/{scm}/{namespace}/{name}/token [patch]
-func HandleTokenRenew(store core.RepoStore) gin.HandlerFunc {
+func HandleTokenRenew(store core.RepoStore, service core.SCMService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user := request.MustGetUserFrom(c)
 		repo, err := store.Find(&core.Repo{
@@ -113,6 +140,10 @@ func HandleTokenRenew(store core.RepoStore) gin.HandlerFunc {
 		})
 		if err != nil {
 			c.String(500, err.Error())
+			return
+		}
+		if !canAccessRepo(c, service, repo) {
+			c.String(403, "forbidden")
 			return
 		}
 		repo.Token = util.GenerateToken()
@@ -126,8 +157,23 @@ func HandleTokenRenew(store core.RepoStore) gin.HandlerFunc {
 			c.String(500, err.Error())
 			return
 		}
-		c.JSON(200, repo)
+		c.JSON(200, gin.H{"token": repo.Token})
 	}
+}
+
+// canAccessRepo reports whether the current user may access the repository,
+// verified against the SCM (used to guard the secret upload token).
+func canAccessRepo(c *gin.Context, service core.SCMService, repo *core.Repo) bool {
+	user, ok := request.UserFrom(c)
+	if !ok {
+		return false
+	}
+	client, err := service.Client(repo.SCM)
+	if err != nil {
+		return false
+	}
+	_, err = client.Repositories().Find(c.Request.Context(), user, repo.FullName())
+	return err == nil
 }
 
 // HandleGet repository

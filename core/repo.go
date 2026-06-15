@@ -12,7 +12,7 @@ type Repo struct {
 	ID        uint
 	URL       string
 	ReportID  string
-	Token     string
+	Token     string `json:"-"`
 	NameSpace string
 	Name      string
 	Branch    string

@@ -125,6 +125,14 @@ func provideNotifyService(
 				Repos:  repoStore,
 				Config: config,
 			},
+			&notifymod.EmailNotifier{
+				Repos:  repoStore,
+				Config: config,
+			},
+			&notifymod.SlackNotifier{
+				Repos:  repoStore,
+				Config: config,
+			},
 		},
 	}
 }

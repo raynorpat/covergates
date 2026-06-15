@@ -32,6 +32,9 @@ type RepoSetting struct {
 	// CoverageDecreaseThreshold is the max allowed coverage drop in percentage
 	// points vs the base build; 0 means any decrease fails.
 	CoverageDecreaseThreshold float64 `json:"coverageDecreaseThreshold"`
+	// DisablePRComment turns off the coverage comment posted to pull requests.
+	// Zero value (false) means comments are enabled.
+	DisablePRComment bool `json:"disablePRComment"`
 }
 
 // RepoService provides repository opperations

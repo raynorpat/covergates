@@ -112,6 +112,7 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 			g.PATCH("/token", repo.HandleTokenRenew(r.RepoStore, r.SCMService))
 			g.GET("/files", repo.HandleGetFiles(r.SCMService))
 			g.GET("/content/*path", repo.HandleGetFileContent(r.SCMService))
+			g.GET("/pulls/:number/changes", build.HandleChanges(r.SCMService, r.RepoStore))
 			g.POST("/hook/create", repo.WithRepo(r.RepoStore), repo.HandleHookCreate(r.HookService, r.SCMService, r.RepoStore))
 			g.GET("/commits", repo.WithRepo(r.RepoStore), repo.HandleListCommits(r.SCMService))
 			g.GET("/branches", repo.WithRepo(r.RepoStore), repo.HandleListBranches(r.SCMService))

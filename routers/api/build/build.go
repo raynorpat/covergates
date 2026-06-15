@@ -169,6 +169,48 @@ func HandleGet(
 	}
 }
 
+// HandleChanges returns the files changed in a pull request.
+// @Summary List a pull request's changed files
+// @Tags Build
+// @Router /repos/{scm}/{namespace}/{name}/pulls/{number}/changes [get]
+func HandleChanges(
+	scmService core.SCMService,
+	repoStore core.RepoStore,
+) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user, ok := request.UserFrom(c)
+		if !ok {
+			c.JSON(401, []*core.FileChange{})
+			return
+		}
+		repo, err := repoStore.Find(&core.Repo{
+			NameSpace: c.Param("namespace"),
+			Name:      c.Param("name"),
+			SCM:       core.SCMProvider(c.Param("scm")),
+		})
+		if err != nil {
+			c.JSON(404, []*core.FileChange{})
+			return
+		}
+		number, err := strconv.Atoi(c.Param("number"))
+		if err != nil {
+			c.JSON(400, []*core.FileChange{})
+			return
+		}
+		client, err := scmService.Client(repo.SCM)
+		if err != nil {
+			c.JSON(500, []*core.FileChange{})
+			return
+		}
+		changes, err := client.PullRequests().ListChanges(c.Request.Context(), user, repo.FullName(), number)
+		if err != nil {
+			c.JSON(500, []*core.FileChange{})
+			return
+		}
+		c.JSON(200, changes)
+	}
+}
+
 // resolveBuild finds the build for this payload or creates a new one.
 func resolveBuild(store core.BuildStore, repo *core.Repo, payload *coverallsPayload) (*core.Build, error) {
 	if payload.ServiceNumber != "" {

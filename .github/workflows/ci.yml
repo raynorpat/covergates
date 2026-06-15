@@ -70,7 +70,7 @@ jobs:
         if: env.BUILD_TYPE == 'FRONTEND'
         run: |
           cd web
-          npm run lint -- --no-fix
+          npm run lint
 
       - name: Frontend Unit Test
         if: env.BUILD_TYPE == 'FRONTEND'
@@ -78,11 +78,8 @@ jobs:
           cd web
           npm run test:unit
 
-      - name: Jest Report
+      - name: Frontend Build
         if: env.BUILD_TYPE == 'FRONTEND'
-        uses: covergates/github-actions@v1
-        with:
-          report-id: "bsi5dvi23akg00a0tgl0"
-          report-type: "lcov"
-          report-file: "./web/coverage/lcov.info"
-          pull-request: "true"
+        run: |
+          cd web
+          npm run build

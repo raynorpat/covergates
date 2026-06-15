@@ -231,3 +231,36 @@ func TestHandleUpdateSettingSetsWebhook(t *testing.T) {
 		}
 	})
 }
+
+func TestHandleUpdateSettingErrorRedactsWebhook(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	store := mock.NewMockRepoStore(ctrl)
+	scm := mock.NewMockSCMService(ctrl)
+	client := mock.NewMockClient(ctrl)
+	repos := mock.NewMockGitRepoService(ctrl)
+
+	scm.EXPECT().Client(core.Github).Return(client, nil)
+	client.EXPECT().Repositories().Return(repos)
+	repos.EXPECT().IsAdmin(gomock.Any(), gomock.Any(), "o/r").Return(true)
+	store.EXPECT().Setting(gomock.Any()).Return(&core.RepoSetting{SlackWebhook: "https://hooks.slack.com/kept"}, nil)
+	store.EXPECT().UpdateSetting(gomock.Any(), gomock.Any()).Return(errors.New("db down"))
+
+	r := gin.New()
+	r.Use(func(c *gin.Context) {
+		request.WithUser(c, &core.User{Login: "u"})
+		c.Set(keyRepo, &core.Repo{Name: "r", NameSpace: "o", SCM: core.Github})
+	})
+	r.POST("/setting", HandleUpdateSetting(store, scm))
+	body := `{"notifyTrigger":"always"}`
+	req := httptest.NewRequest("POST", "/setting", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	testRequest(r, req, func(w *httptest.ResponseRecorder) {
+		if w.Code != 500 {
+			t.Fatalf("status = %d, want 500", w.Code)
+		}
+		if strings.Contains(w.Body.String(), "hooks.slack.com") {
+			t.Fatalf("error response must not leak the webhook secret, got: %s", w.Body.String())
+		}
+	})
+}

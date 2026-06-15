@@ -470,6 +470,7 @@ func HandleUpdateSetting(store core.RepoStore, service core.SCMService) gin.Hand
 			}
 		}
 		if err := store.UpdateSetting(repo, setting); err != nil {
+			setting.SlackWebhook = ""
 			c.JSON(500, setting)
 			return
 		}

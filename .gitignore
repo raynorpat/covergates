@@ -35,3 +35,6 @@ test.log
 /cmd/cli/cli
 /covergates
 /covergates-server
+
+# Brainstorm visual companion
+.superpowers/

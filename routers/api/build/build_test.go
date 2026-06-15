@@ -77,6 +77,7 @@ func TestHandleJobsParallelDoesNotFinalize(t *testing.T) {
 	builds.EXPECT().AddJob(gomock.Any(), gomock.Any()).Return(nil)
 	// No Finalize expected.
 	notify := mock.NewMockNotifyService(ctrl)
+	// No Notify expected (build is not finalized).
 
 	r := gin.New()
 	r.POST("/api/v1/jobs", HandleJobs(newConfig(), repos, builds, svc, notify))
@@ -98,6 +99,7 @@ func TestHandleJobsBadToken(t *testing.T) {
 	svc := mock.NewMockBuildService(ctrl)
 
 	repos.EXPECT().Find(&core.Repo{Token: "bad"}).Return(nil, gorm.ErrRecordNotFound)
+	// No Notify expected (bad token, no build).
 	notify := mock.NewMockNotifyService(ctrl)
 
 	r := gin.New()
@@ -145,6 +147,7 @@ func TestHandleWebhookUnknownBuild(t *testing.T) {
 
 	repos.EXPECT().Find(&core.Repo{Token: "tok"}).Return(&core.Repo{ID: 1}, nil)
 	builds.EXPECT().FindByServiceNumber(uint(1), "9").Return(nil, gorm.ErrRecordNotFound)
+	// No Notify expected (build not found, never finalized).
 	notify := mock.NewMockNotifyService(ctrl)
 
 	r := gin.New()
@@ -184,6 +187,7 @@ func TestHandleWebhookBadJSON(t *testing.T) {
 	svc := mock.NewMockBuildService(ctrl)
 
 	repos.EXPECT().Find(&core.Repo{Token: "tok"}).Return(&core.Repo{ID: 1}, nil)
+	// No Notify expected (invalid payload, never finalized).
 	notify := mock.NewMockNotifyService(ctrl)
 
 	r := gin.New()

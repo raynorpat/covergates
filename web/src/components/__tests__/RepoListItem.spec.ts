@@ -55,7 +55,7 @@ describe('RepoListItem', () => {
     expect(w.html()).toContain('secret123')
   })
 
-  it('activated repo rotates token via PATCH /token', async () => {
+  it('rotate token calls PATCH /token and updates token display', async () => {
     ;(http.get as any).mockResolvedValue({ data: { token: 'old' } })
     ;(http.patch as any).mockResolvedValue({ data: { token: 'new456' } })
     const w = mountItem({ ...baseRepo, ReportID: 'abc' })

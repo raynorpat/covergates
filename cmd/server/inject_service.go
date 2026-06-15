@@ -120,6 +120,11 @@ func provideNotifyService(
 				Repos:  repoStore,
 				Config: config,
 			},
+			&notifymod.CommentNotifier{
+				SCM:    scmService,
+				Repos:  repoStore,
+				Config: config,
+			},
 		},
 	}
 }

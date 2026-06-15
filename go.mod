@@ -25,6 +25,7 @@ require (
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/mock v1.6.0
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.8
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/google/wire v0.5.0
@@ -49,7 +50,6 @@ require (
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be // indirect
 	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69 // indirect
 	golang.org/x/net v0.0.0-20220927171203-f486391704dc
-	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 	golang.org/x/sys v0.0.0-20220927170352-d9d178bc13c6 // indirect
 	golang.org/x/text v0.3.7
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect

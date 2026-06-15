@@ -29,7 +29,7 @@ describe('repository store', () => {
   })
 
   it('fetchSetting and updateSetting hit the setting endpoint', async () => {
-    const s = { filters: ['a'], mergePR: true, updateAction: 'merge', protected: false, coverageMinimum: 0, coverageDecreaseThreshold: 0 }
+    const s = { filters: ['a'], mergePR: true, updateAction: 'merge', protected: false, coverageMinimum: 0, coverageDecreaseThreshold: 0, disablePRComment: false }
     ;(http.get as any).mockResolvedValue({ data: s })
     ;(http.post as any).mockResolvedValue({ data: s })
     const store = useRepositoryStore()

@@ -7,17 +7,20 @@ const emit = defineEmits<{ (e: 'save', value: RepoSetting): void }>()
 
 const minimum = ref(props.modelValue.coverageMinimum ?? 0)
 const decrease = ref(props.modelValue.coverageDecreaseThreshold ?? 0)
+const commentOn = ref(!props.modelValue.disablePRComment)
 
 watch(() => props.modelValue, (v) => {
   minimum.value = v.coverageMinimum ?? 0
   decrease.value = v.coverageDecreaseThreshold ?? 0
+  commentOn.value = !v.disablePRComment
 })
 
 function save() {
   emit('save', {
     ...props.modelValue,
     coverageMinimum: Number(minimum.value) || 0,
-    coverageDecreaseThreshold: Number(decrease.value) || 0
+    coverageDecreaseThreshold: Number(decrease.value) || 0,
+    disablePRComment: !commentOn.value
   })
 }
 </script>
@@ -40,6 +43,7 @@ function save() {
       label="Max coverage decrease % (0 = any decrease fails)"
       density="compact"
     />
+    <v-switch v-model="commentOn" label="Comment on pull requests" color="primary" hide-details class="mb-2" />
     <v-btn color="primary" :loading="busy" @click="save">Save</v-btn>
   </v-card>
 </template>

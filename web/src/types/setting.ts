@@ -5,4 +5,5 @@ export interface RepoSetting {
   protected: boolean
   coverageMinimum: number
   coverageDecreaseThreshold: number
+  disablePRComment: boolean
 }

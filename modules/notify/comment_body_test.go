@@ -12,7 +12,7 @@ func ptr(i int) *int { return &i }
 func TestCoverageByPath(t *testing.T) {
 	build := &core.Build{SourceFiles: []*core.SourceFile{
 		{Name: "a.go", Coverage: []*int{ptr(1), ptr(0)}}, // 1/2 = 0.5
-		{Name: "b.go", Coverage: []*int{ptr(2), ptr(3)}}, // 2/2 = 1.0
+		{Name: "b.go", Coverage: []*int{ptr(2), ptr(3)}}, // both >0 -> 2/2 = 1.0
 		{Name: "c.go", Coverage: []*int{nil, nil}},       // no relevant lines -> -1
 	}}
 	cov := coverageByPath(build)
@@ -28,16 +28,16 @@ func TestCoverageByPath(t *testing.T) {
 }
 
 func TestCommentBody(t *testing.T) {
-	repo := &core.Repo{NameSpace: "o", Name: "r", SCM: core.Github}
 	build := &core.Build{Number: 12, BaseBuildNumber: 9}
 	verdict := &core.Verdict{State: core.StatusFailure, Description: "Coverage decreased 1.0% to 84.0%"}
 	changes := []*core.FileChange{
 		{Path: "a.go"},
 		{Path: "c.go"},
 		{Path: "gone.go", Deleted: true},
+		{Path: "a|b.go"},
 	}
-	cov := map[string]float64{"a.go": 0.853, "c.go": -1}
-	body := commentBody(repo, build, verdict, changes, cov, "http://h/report/github/o/r/builds/12")
+	cov := map[string]float64{"a.go": 0.853, "c.go": -1, "a|b.go": 0.5}
+	body := commentBody(build, verdict, changes, cov, "http://h/report/github/o/r/builds/12")
 
 	for _, want := range []string{
 		"## Coverage ❌ failed",
@@ -48,6 +48,7 @@ func TestCommentBody(t *testing.T) {
 		"| a.go | 85.3% |",
 		"| c.go | — |",
 		"| gone.go | deleted |",
+		`| a\|b.go | 50.0% |`,
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("body missing %q\n---\n%s", want, body)
@@ -56,10 +57,9 @@ func TestCommentBody(t *testing.T) {
 }
 
 func TestCommentBodyNoChangesNoBase(t *testing.T) {
-	repo := &core.Repo{NameSpace: "o", Name: "r", SCM: core.Github}
 	build := &core.Build{Number: 3, BaseBuildNumber: 0}
 	verdict := &core.Verdict{State: core.StatusSuccess, Description: "Coverage: 90.0%"}
-	body := commentBody(repo, build, verdict, nil, map[string]float64{}, "http://h/x")
+	body := commentBody(build, verdict, nil, map[string]float64{}, "http://h/x")
 
 	if !strings.Contains(body, "## Coverage ✅ passed") {
 		t.Errorf("missing success header:\n%s", body)

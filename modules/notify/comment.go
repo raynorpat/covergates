@@ -32,7 +32,7 @@ func coverageByPath(build *core.Build) map[string]float64 {
 }
 
 // commentBody renders the PR coverage comment markdown.
-func commentBody(repo *core.Repo, build *core.Build, verdict *core.Verdict,
+func commentBody(build *core.Build, verdict *core.Verdict,
 	changes []*core.FileChange, cov map[string]float64, target string) string {
 	var b strings.Builder
 	emoji, label := statusBadge(verdict.State)
@@ -48,7 +48,7 @@ func commentBody(repo *core.Repo, build *core.Build, verdict *core.Verdict,
 		b.WriteString("\n### Changed files\n")
 		b.WriteString("| File | Coverage |\n| --- | --- |\n")
 		for _, ch := range changes {
-			fmt.Fprintf(&b, "| %s | %s |\n", ch.Path, coverageCell(ch, cov))
+			fmt.Fprintf(&b, "| %s | %s |\n", strings.ReplaceAll(ch.Path, "|", `\|`), coverageCell(ch, cov))
 		}
 	}
 	return b.String()

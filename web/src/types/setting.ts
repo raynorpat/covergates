@@ -6,4 +6,7 @@ export interface RepoSetting {
   coverageMinimum: number
   coverageDecreaseThreshold: number
   disablePRComment: boolean
+  emailRecipients: string[]
+  slackWebhook: string
+  notifyTrigger: string
 }

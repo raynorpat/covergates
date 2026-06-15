@@ -10,7 +10,8 @@ const vuetify = createVuetify({ components, directives })
 
 const setting: RepoSetting = {
   filters: [], mergePR: false, updateAction: '', protected: false,
-  coverageMinimum: 80, coverageDecreaseThreshold: 2, disablePRComment: false
+  coverageMinimum: 80, coverageDecreaseThreshold: 2, disablePRComment: false,
+  emailRecipients: [], slackWebhook: '', notifyTrigger: 'failure'
 }
 
 describe('SettingsChecks', () => {

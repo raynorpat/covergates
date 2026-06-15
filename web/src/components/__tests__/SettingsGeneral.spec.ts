@@ -10,7 +10,7 @@ const vuetify = createVuetify({ components, directives })
 describe('SettingsGeneral', () => {
   it('emits save with edited filters', async () => {
     const w = mount(SettingsGeneral, {
-      props: { modelValue: { filters: ['x'], mergePR: false, updateAction: 'merge', protected: false, coverageMinimum: 0, coverageDecreaseThreshold: 0, disablePRComment: false } },
+      props: { modelValue: { filters: ['x'], mergePR: false, updateAction: 'merge', protected: false, coverageMinimum: 0, coverageDecreaseThreshold: 0, disablePRComment: false, emailRecipients: [], slackWebhook: '', notifyTrigger: 'failure' } },
       global: { plugins: [vuetify] }
     })
     const textarea = w.find('textarea')

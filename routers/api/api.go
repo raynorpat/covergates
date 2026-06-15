@@ -78,6 +78,7 @@ func (r *Router) RegisterRoutes(e *gin.Engine) {
 		// repo
 		g.PATCH("/repos", checkLogin, user.HandleSynchronizeRepo(r.RepoService))
 		g.GET("/repos", checkLogin, user.HandleListRepo(r.UserStore))
+		g.GET("/stats", checkLogin, user.HandleRepoStats(r.UserStore, r.BuildStore))
 	}
 	{
 		g := g.Group("/reports")

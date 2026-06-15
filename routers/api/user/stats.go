@@ -33,6 +33,7 @@ func HandleRepoStats(userStore core.UserStore, buildStore core.BuildStore) gin.H
 		user := request.MustGetUserFrom(c)
 		repos, err := userStore.ListRepositories(user)
 		if err != nil {
+			c.Error(err)
 			c.JSON(500, &repoStats{})
 			return
 		}

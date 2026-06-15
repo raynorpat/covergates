@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -63,5 +64,26 @@ func TestHandleRepoStats(t *testing.T) {
 	}
 	if len(got.TopRepos) != 2 || got.TopRepos[0].Name != "a" || got.TopRepos[1].Name != "b" {
 		t.Fatalf("topRepos wrong: %+v", got.TopRepos) // repo c (no build) excluded; sorted desc by coverage
+	}
+}
+
+func TestHandleRepoStatsListError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	u := &core.User{Login: "test"}
+	userStore := mock.NewMockUserStore(ctrl)
+	buildStore := mock.NewMockBuildStore(ctrl)
+	userStore.EXPECT().ListRepositories(u).Return(nil, errors.New("db down"))
+
+	r := gin.New()
+	r.Use(func(c *gin.Context) { request.WithUser(c, u) })
+	r.GET("/user/stats", user.HandleRepoStats(userStore, buildStore))
+
+	req, _ := http.NewRequest("GET", "/user/stats", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	if w.Code != 500 {
+		t.Fatalf("status = %d, want 500", w.Code)
 	}
 }

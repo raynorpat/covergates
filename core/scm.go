@@ -75,6 +75,8 @@ type GitRepoService interface {
 	CreateHook(ctx context.Context, user *User, name string) (*Hook, error)
 	RemoveHook(ctx context.Context, user *User, name string, hook *Hook) error
 	IsAdmin(ctx context.Context, user *User, name string) bool
+	// CreateStatus posts a commit status to the given ref (commit SHA).
+	CreateStatus(ctx context.Context, user *User, repo, ref string, status *Status) error
 }
 
 // UserService defines operations with SCM

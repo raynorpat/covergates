@@ -131,3 +131,29 @@ func (service *repoService) IsAdmin(ctx context.Context, user *core.User, name s
 	}
 	return perm.Admin
 }
+
+func (service *repoService) CreateStatus(ctx context.Context, user *core.User, repo, ref string, status *core.Status) error {
+	ctx = withUser(ctx, service.scm, user)
+	input := &scm.StatusInput{
+		State:  toSCMState(status.State),
+		Label:  status.Label,
+		Title:  status.Label,
+		Desc:   status.Desc,
+		Target: status.Target,
+	}
+	_, _, err := service.client.Repositories.CreateStatus(ctx, repo, ref, input)
+	return err
+}
+
+func toSCMState(s core.StatusState) scm.State {
+	switch s {
+	case core.StatusSuccess:
+		return scm.StateSuccess
+	case core.StatusFailure:
+		return scm.StateFailure
+	case core.StatusError:
+		return scm.StateError
+	default:
+		return scm.StatePending
+	}
+}

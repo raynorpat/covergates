@@ -224,6 +224,20 @@ func (mr *MockGitRepoServiceMockRecorder) CreateHook(arg0, arg1, arg2 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateHook", reflect.TypeOf((*MockGitRepoService)(nil).CreateHook), arg0, arg1, arg2)
 }
 
+// CreateStatus mocks base method.
+func (m *MockGitRepoService) CreateStatus(arg0 context.Context, arg1 *core.User, arg2, arg3 string, arg4 *core.Status) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateStatus", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateStatus indicates an expected call of CreateStatus.
+func (mr *MockGitRepoServiceMockRecorder) CreateStatus(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateStatus", reflect.TypeOf((*MockGitRepoService)(nil).CreateStatus), arg0, arg1, arg2, arg3, arg4)
+}
+
 // Find mocks base method
 func (m *MockGitRepoService) Find(arg0 context.Context, arg1 *core.User, arg2 string) (*core.Repo, error) {
 	m.ctrl.T.Helper()

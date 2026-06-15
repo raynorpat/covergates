@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-//go:generate mockgen -package mock -destination ../mock/scm_mock.go . SCMService,Client,GitRepoService,UserService,ContentService,GitService,WebhookService
+//go:generate mockgen -package mock -destination ../mock/scm_mock.go . SCMService,Client,GitRepoService,UserService,ContentService,GitService,WebhookService,PullRequestService
 
 // SCMService to interact with given SCM provider
 type SCMService interface {

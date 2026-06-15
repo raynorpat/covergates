@@ -594,3 +594,85 @@ func (mr *MockWebhookServiceMockRecorder) Parse(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Parse", reflect.TypeOf((*MockWebhookService)(nil).Parse), arg0)
 }
+
+// MockPullRequestService is a mock of PullRequestService interface
+type MockPullRequestService struct {
+	ctrl     *gomock.Controller
+	recorder *MockPullRequestServiceMockRecorder
+}
+
+// MockPullRequestServiceMockRecorder is the mock recorder for MockPullRequestService
+type MockPullRequestServiceMockRecorder struct {
+	mock *MockPullRequestService
+}
+
+// NewMockPullRequestService creates a new mock instance
+func NewMockPullRequestService(ctrl *gomock.Controller) *MockPullRequestService {
+	mock := &MockPullRequestService{ctrl: ctrl}
+	mock.recorder = &MockPullRequestServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockPullRequestService) EXPECT() *MockPullRequestServiceMockRecorder {
+	return m.recorder
+}
+
+// CreateComment mocks base method
+func (m *MockPullRequestService) CreateComment(arg0 context.Context, arg1 *core.User, arg2 string, arg3 int, arg4 string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateComment", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateComment indicates an expected call of CreateComment
+func (mr *MockPullRequestServiceMockRecorder) CreateComment(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateComment", reflect.TypeOf((*MockPullRequestService)(nil).CreateComment), arg0, arg1, arg2, arg3, arg4)
+}
+
+// Find mocks base method
+func (m *MockPullRequestService) Find(arg0 context.Context, arg1 *core.User, arg2 string, arg3 int) (*core.PullRequest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Find", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(*core.PullRequest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Find indicates an expected call of Find
+func (mr *MockPullRequestServiceMockRecorder) Find(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockPullRequestService)(nil).Find), arg0, arg1, arg2, arg3)
+}
+
+// ListChanges mocks base method
+func (m *MockPullRequestService) ListChanges(arg0 context.Context, arg1 *core.User, arg2 string, arg3 int) ([]*core.FileChange, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListChanges", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].([]*core.FileChange)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListChanges indicates an expected call of ListChanges
+func (mr *MockPullRequestServiceMockRecorder) ListChanges(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListChanges", reflect.TypeOf((*MockPullRequestService)(nil).ListChanges), arg0, arg1, arg2, arg3)
+}
+
+// RemoveComment mocks base method
+func (m *MockPullRequestService) RemoveComment(arg0 context.Context, arg1 *core.User, arg2 string, arg3, arg4 int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveComment", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveComment indicates an expected call of RemoveComment
+func (mr *MockPullRequestServiceMockRecorder) RemoveComment(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveComment", reflect.TypeOf((*MockPullRequestService)(nil).RemoveComment), arg0, arg1, arg2, arg3, arg4)
+}

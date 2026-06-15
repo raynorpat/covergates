@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import axios from 'axios'
 import { errorMessage } from '@/plugins/http'
+import { is401, loginUrl } from '@/lib/auth'
 import { useBuildStore } from '@/stores/build'
-import { basePath } from '@/lib/base'
 import SourceLines from '@/components/SourceLines.vue'
 
 const route = useRoute()
@@ -20,7 +19,7 @@ const name = computed(() => String(route.params.name))
 const number = computed(() => Number(route.params.number))
 const path = computed(() => Array.isArray(route.params.path) ? route.params.path.join('/') : String(route.params.path))
 const repoPath = computed(() => `/api/v1/repos/${scm.value}/${namespace.value}/${name.value}`)
-const loginUrl = computed(() => `${basePath()}/login?redirect=${encodeURIComponent(route.fullPath)}`)
+const signInUrl = computed(() => loginUrl(route.fullPath))
 
 const coverage = computed<(number | null)[]>(() => {
   const f = store.current?.sourceFiles?.find((s) => s.name === path.value)
@@ -38,7 +37,7 @@ async function load() {
     const commit = store.current?.commit ?? ''
     source.value = await store.fetchSource(repoPath.value, path.value, commit)
   } catch (e) {
-    if (axios.isAxiosError(e) && e.response?.status === 401) {
+    if (is401(e)) {
       needLogin.value = true
     } else {
       error.value = errorMessage(e)
@@ -57,7 +56,7 @@ onMounted(load)
     <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-3" />
     <v-card v-else-if="needLogin" class="pa-6 text-center">
       <p class="mb-4">Sign in to view source for this repository.</p>
-      <v-btn color="primary" :href="loginUrl">Sign in</v-btn>
+      <v-btn color="primary" :href="signInUrl">Sign in</v-btn>
     </v-card>
     <v-alert v-else-if="error" type="warning" variant="tonal">{{ error }}</v-alert>
     <SourceLines v-else :source="source" :coverage="coverage" :path="path" />

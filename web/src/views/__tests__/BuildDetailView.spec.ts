@@ -9,6 +9,7 @@ import http from '@/plugins/http'
 import BuildDetailView from '@/views/BuildDetailView.vue'
 
 vi.mock('@/plugins/http', () => ({ default: { get: vi.fn() }, errorMessage: (e: unknown) => String(e) }))
+vi.mock('axios', () => ({ default: { isAxiosError: (e: any) => !!e?.isAxiosError } }))
 
 const vuetify = createVuetify({ components, directives })
 
@@ -38,5 +39,25 @@ describe('BuildDetailView', () => {
     await flushPromises()
     expect(w.text()).toContain('Build #5')
     expect(w.text()).toContain('a.go')
+  })
+
+  it('shows sign-in prompt on 401', async () => {
+    ;(http.get as any).mockRejectedValue({ isAxiosError: true, response: { status: 401 } })
+    const router = makeRouter()
+    router.push('/report/github/o/r/builds/5')
+    await router.isReady()
+    const w = mount(BuildDetailView, { global: { plugins: [vuetify, router] } })
+    await flushPromises()
+    expect(w.text()).toContain('Sign in to view this repository')
+  })
+
+  it('shows not-found on 404', async () => {
+    ;(http.get as any).mockRejectedValue({ isAxiosError: true, response: { status: 404 } })
+    const router = makeRouter()
+    router.push('/report/github/o/r/builds/9')
+    await router.isReady()
+    const w = mount(BuildDetailView, { global: { plugins: [vuetify, router] } })
+    await flushPromises()
+    expect(w.text()).toContain('Build not found')
   })
 })

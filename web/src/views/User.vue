@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
+import AccountBindings from '@/components/AccountBindings.vue'
 
 const user = useUserStore()
 onMounted(() => { if (!user.current) user.fetch() })
@@ -22,6 +23,9 @@ onMounted(() => { if (!user.current) user.fetch() })
             </div>
           </div>
         </v-card>
+      </v-col>
+      <v-col cols="12" md="6">
+        <AccountBindings />
       </v-col>
     </v-row>
   </v-container>

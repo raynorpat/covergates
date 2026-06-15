@@ -16,7 +16,7 @@
 
 **Base-path mechanism (used throughout):** The backend serves the SPA by running `dist/index.html` through Go `text/template` with `.` = `config.Server.Base`, and serves hashed assets at `/assets/*`. Therefore:
 - `index.html` contains `<script>window.VUE_BASE = '{{.}}'</script>`; the SPA reads `window.VUE_BASE` at runtime for router history base + API base (JS bundles are NOT templated, so the base cannot come from `import.meta.env.BASE_URL`).
-- Vite production `base` is set to the template token so asset URLs in `index.html` get the `{{.}}` prefix (substituted at serve time). **Primary:** `base: '{{.}}/'`. Task 1 verifies the built `index.html` actually contains `{{.}}/assets/...`; if Vite mangles it, apply the documented fallback in Task 1.
+- Asset URLs in `index.html` must get the `{{.}}` prefix (substituted at serve time). **Implemented mechanism:** Vite `base: '/'` plus a build-only `transformIndexHtml` plugin (`gates-base-token`) that rewrites injected `="/assets/`/`="/favicon.ico"` to `="{{.}}/...`. (Note: setting `base: '{{.}}/'` does NOT work — Vite forces a leading slash, producing `/{{.}}/assets/...` which becomes `//assets/...` after substitution.) Verify the raw `dist/index.html` asset URLs are `="{{.}}/assets/..."` with no leading slash.
 - B1 uses **static (eager) route imports** (no lazy `() => import()`), so no dynamic chunk URLs need runtime base resolution.
 
 ---

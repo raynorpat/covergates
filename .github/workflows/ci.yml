@@ -90,7 +90,7 @@ jobs:
           cd web
           npm run test:coverage
 
-      - name: Jest Report
+      - name: Vitest Report
         if: env.BUILD_TYPE == 'FRONTEND'
         uses: covergates/github-actions@v1
         with:

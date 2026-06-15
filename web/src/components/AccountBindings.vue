@@ -6,16 +6,23 @@ import { basePath } from '@/lib/base'
 const user = useUserStore()
 onMounted(() => user.fetchScm())
 
-const providers = [
-  { scm: 'github', label: 'GitHub', icon: 'mdi-github' },
-  { scm: 'gitea', label: 'Gitea', icon: 'mdi-git' },
-  { scm: 'gitlab', label: 'GitLab', icon: 'mdi-gitlab' }
-]
-
-const rows = computed(() => providers.map((p) => ({ ...p, linked: !!user.scm[p.scm] })))
-function linkUrl(scm: string) {
-  return `${basePath()}/login/${scm}?bind`
+const META: Record<string, { label: string; icon: string }> = {
+  github: { label: 'GitHub', icon: 'mdi-github' },
+  gitea: { label: 'Gitea', icon: 'mdi-git' },
+  gitlab: { label: 'GitLab', icon: 'mdi-gitlab' }
 }
+
+const rows = computed(() =>
+  Object.entries(user.scm).map(([scm, linked]) => ({
+    scm,
+    linked,
+    label: META[scm]?.label ?? scm,
+    icon: META[scm]?.icon ?? 'mdi-git'
+  }))
+)
+
+// The backend binds the single configured SCM to the current account via /login?bind.
+const bindUrl = `${basePath()}/login?bind`
 </script>
 
 <template>
@@ -25,7 +32,7 @@ function linkUrl(scm: string) {
       <v-list-item v-for="p in rows" :key="p.scm" :title="p.label" :prepend-icon="p.icon">
         <template #append>
           <v-icon v-if="p.linked" color="success" aria-label="linked">mdi-check-circle</v-icon>
-          <v-btn v-else size="small" variant="tonal" :href="linkUrl(p.scm)">Link</v-btn>
+          <v-btn v-else size="small" variant="tonal" :href="bindUrl">Link</v-btn>
         </template>
       </v-list-item>
     </v-list>

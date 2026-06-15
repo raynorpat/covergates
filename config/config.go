@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 // Config of application
 type Config struct {
 	Server   Server
+	SMTP     SMTP
 	Gitea    Gitea
 	Github   Github
 	GitLab   GitLab
@@ -28,6 +30,20 @@ type Server struct {
 	ServerPort  string `envconfig:"GATES_SERVER_PORT"`
 	CloudPort   string `envconfig:"PORT"`
 	OAuthClient string `default:"client"`
+}
+
+// SMTP server setting for outbound notification email.
+type SMTP struct {
+	Host     string `envconfig:"GATES_SMTP_HOST"`
+	Port     string `default:"587" envconfig:"GATES_SMTP_PORT"`
+	Username string `envconfig:"GATES_SMTP_USERNAME"`
+	Password string `envconfig:"GATES_SMTP_PASSWORD"`
+	From     string `envconfig:"GATES_SMTP_FROM"`
+}
+
+// Addr is the host:port SMTP dial address.
+func (s SMTP) Addr() string {
+	return net.JoinHostPort(s.Host, s.Port)
 }
 
 // Database setting

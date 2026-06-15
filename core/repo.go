@@ -35,6 +35,12 @@ type RepoSetting struct {
 	// DisablePRComment turns off the coverage comment posted to pull requests.
 	// Zero value (false) means comments are enabled.
 	DisablePRComment bool `json:"disablePRComment"`
+	// EmailRecipients receive coverage notification email (empty disables email).
+	EmailRecipients []string `json:"emailRecipients"`
+	// SlackWebhook is the incoming-webhook URL for Slack notifications (empty disables).
+	SlackWebhook string `json:"slackWebhook"`
+	// NotifyTrigger controls when email/Slack fire: "off", "failure" (default), "always".
+	NotifyTrigger string `json:"notifyTrigger"`
 }
 
 // RepoService provides repository opperations

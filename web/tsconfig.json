@@ -14,14 +14,6 @@
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] }
   },
-  "include": [
-    "src/main.ts",
-    "src/App.vue",
-    "src/lib/**/*.ts",
-    "src/plugins/vuetify.ts",
-    "src/router/index.ts",
-    "src/layouts/**/*.vue",
-    "env.d.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.vue", "env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

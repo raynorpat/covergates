@@ -64,6 +64,20 @@ func TestEvaluate(t *testing.T) {
 			wantState: core.StatusFailure,
 			wantDesc:  "below the minimum",
 		},
+		{
+			name:      "exactly at minimum passes",
+			build:     &core.Build{Status: core.BuildDone, Coverage: 0.80},
+			setting:   &core.RepoSetting{CoverageMinimum: 80},
+			wantState: core.StatusSuccess,
+			wantDesc:  "80.0%",
+		},
+		{
+			name:      "nil setting no base passes",
+			build:     &core.Build{Status: core.BuildDone, Coverage: 0.70},
+			setting:   nil,
+			wantState: core.StatusSuccess,
+			wantDesc:  "70.0%",
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

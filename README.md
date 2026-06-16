@@ -35,12 +35,13 @@ unzip covergates-<version>-<platform>-<architecture>.zip
 
 Visit [http://localhost:8080](http://localhost:8080) for your **covergates** service.
 
-To upload report, run `covergate` cli:
+## Uploading coverage
 
-```sh
-export API_URL=http://localhost:8080/api/v1
-covergates upload -report <report id> -type go coverage.out
-```
+Covergates is **Coveralls-compatible**: it accepts coverage uploads in the Coveralls
+JSON format at `POST /api/v1/jobs` and finalizes parallel builds via `POST /webhook`.
+Activate a repository in the web UI to obtain its **upload token**, then point any
+Coveralls-compatible reporter at your server (set the Coveralls API endpoint to
+`http://localhost:8080/api/v1` and use the repository upload token).
 
 ## Configure
 
@@ -73,38 +74,29 @@ Below is the list of variables for basic configuration:
 | Gogs      | :x:                |
 | Bitbucket | :x:                |
 
-| Language                  | Supported          | Tutorial                                               |
-| ------------------------- | ------------------ | ------------------------------------------------------ |
-| Go                        | :heavy_check_mark: | [go-example](https://github.com/covergates/go-example) |
-| Perl                      | :heavy_check_mark: | :wrench:, ongoing                                      |
-| Python                    | :heavy_check_mark: | :wrench:, ongoing                                      |
-| Ruby (SimpleCov: RSpec)   | :heavy_check_mark: | :heavy_minus_sign:                                     |
-| lcov (C, C++, Javascript) | :heavy_check_mark: | :heavy_minus_sign:                                     |
-| Clover (PHP)              | :heavy_check_mark: | :heavy_minus_sign:                                     |
-| Java (Jacoco)             | :wrench:, ongoing  | :heavy_minus_sign:                                     |
+Coverage is ingested in the **Coveralls JSON** format, so any language with a
+Coveralls-compatible reporter (Go, Python, Ruby, JavaScript/lcov, PHP, Java, …) is supported.
 
-**Covergates** is at an early development stage.
-Other languages and SCM support is ongoing!
-If you would like to assist with development, please refer to [Contributing Section](#contributing).
+## Notifications & checks
+
+After a build finalizes, Covergates can:
+
+- post a `coverage/covergates` **commit status** with a configurable pass/fail policy
+  (minimum coverage and maximum decrease),
+- post (and refresh) a **coverage comment** on the pull request,
+- send **email** (server SMTP) and **Slack** (per-repo webhook) notifications.
+
+These are configured per repository from the repository **Settings** page.
 
 ## Development
 
-The build is split into `backend`, `cli` and `frontend`. To build backend, run:
+The build is split into `backend` and `frontend`. To build the backend, run:
 
 ```sh
 go build -o covergates-server ./cmd/server
 ```
 
-To build CLI, run:
-
-```sh
-export SERVER_API_URL=http://localhost:8080/api/v1
-go build -o covergates -ldflags="-X main.CoverGatesAPI=$SERVER_API_URL" ./cmd/cli
-```
-
-You may change `SERVER_API_URL` to your self-hosted **covergates-server** address.
-
-If your are behind firewall or proxy,
+If you are behind firewall or proxy,
 you may also download source package with `vendor` modules from [covergates.**version**.src.zip
 ](https://github.com/covergates/covergates/releases). To build with `vendor` modules, run:
 
@@ -112,10 +104,10 @@ you may also download source package with `vendor` modules from [covergates.**ve
 go build -o covergates-server -mod vendor ./cmd/server
 ```
 
-To build frontend, it requires:
+To build the frontend (Vue 3 + Vite), it requires:
 
-1. [Node.js v12](https://nodejs.org/en/download/)
-2. [togo](https://github.com/bradrydzewski/togo)
+1. [Node.js 18+](https://nodejs.org/en/download/)
+2. [togo](https://github.com/bradrydzewski/togo) (embeds the built frontend into the server)
 
 Read [web/README.md](https://github.com/covergates/covergates/blob/master/web/README.md) for more details.
 
@@ -139,10 +131,6 @@ There are many ways in which you can participate in the project:
 ## Further Information
 
 For more information and tutorial about self-hosted Covergates server, please refer to our [documentation](https://docs.covergates.com/)
-
-## Milestones
-
-Refer to [TODO.md](https://github.com/covergates/covergates/blob/master/TODO.md) for details.
 
 ## License
 
